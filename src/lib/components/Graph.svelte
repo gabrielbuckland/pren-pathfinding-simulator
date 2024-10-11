@@ -3,7 +3,7 @@
 	import Node from './Node.svelte';
 
 	const containerSize = 35 * 16; // 35rem in pixels (1 rem = 16px by default)
-	const centerX = containerSize / 2; // Center of the graph
+	const centerX = containerSize / 2;
 	const centerY = containerSize / 2;
 	const radius = containerSize / 2.5;
 
@@ -49,7 +49,6 @@
 		{ id: '2', x: 230, y: 170, isObsticle: false } // Top-left center
 	];
 
-	// Function to convert the list to an object
 	function getNodesById(nodes) {
 		return nodes.reduce((acc, node) => {
 			acc[node.id] = node;
@@ -57,7 +56,6 @@
 		}, {});
 	}
 
-	// Usage
 	let nodesById = getNodesById(nodes);
 
 	let edges = [
