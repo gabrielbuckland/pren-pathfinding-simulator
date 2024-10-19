@@ -7,7 +7,7 @@
 	}
 
 	h1 {
-		margin-top: 0; /* Remove the default top margin */
-		margin-bottom: 0.5rem; /* Optional: Adjust the bottom margin */
-  }
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+	}
 </style>

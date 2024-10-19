@@ -2,34 +2,69 @@
 	import Container from '../lib/components/Container.svelte';
 	import Graph from '../lib/components/Graph.svelte';
 	import Title from '../lib/components/Title.svelte';
-  </script>
+	import VehicleParameters from '../lib/components/VehicleParameters.svelte';
+	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
+	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
+</script>
 
-  <svelte:head>
+<svelte:head>
 	<title>Simulator</title>
 	<meta name="description" content="Simulator" />
-  </svelte:head>
+</svelte:head>
 
-  <Container>
-	<div slot="left">
-	  <Title>Graph</Title>
-	  <Graph />
+<Container>
+	<!-- Left Pane -->
+	<div slot="left" class="left-pane">
+		<Title>Graph</Title>
+		<Graph />
 	</div>
 
-	<div slot="right">
+	<!-- Right Pane -->
+	<div slot="right" class="right-pane">
 		<Title>Dashboard</Title>
 
-	  <button>Button 1</button>
-	  <button>Button 2</button>
-	  <button>Button 3</button>
+		<div class="section">
+			<Title>Vehicle-Parameters:</Title>
+			<VehicleParameters />
+		</div>
 
+		<div class="section">
+			<Title>Algorithm-Selection:</Title>
+			<AlgorithmSelection />
+		</div>
+
+		<div class="section">
+			<Title>Simulator-Options:</Title>
+			<SimulatorOptions />
+		</div>
 	</div>
-  </Container>
+</Container>
 
-  <style>
-	button {
-		display: block;
-		margin: 0.5rem 0;
-		padding: 0.5rem;
-		width: 100%;
+<style>
+	.left-pane {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
-  </style>
+
+	.right-pane {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow-y: auto;
+	}
+
+	.section {
+		padding: 1rem;
+	}
+
+	.section:last-child {
+		border-bottom: none;
+	}
+
+	.section :global(h1) {
+		margin-top: 0;
+		margin-bottom: 1rem;
+		font-size: 1.2rem;
+	}
+</style>
