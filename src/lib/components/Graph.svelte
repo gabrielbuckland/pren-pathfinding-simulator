@@ -96,7 +96,6 @@
 		position: relative;
 		width: 35rem;
 		height: 35rem;
-		border: 1px solid #ccc;
 		margin: auto;
 	}
 </style>
