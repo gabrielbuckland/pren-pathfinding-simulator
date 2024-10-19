@@ -69,7 +69,7 @@
 		{ id: 8, from: '4', to: 'C', type: 'solid' }, // Center to Bottom-right
 		{ id: 9, from: '4', to: 'B', type: 'solid' }, // Center to Bottom
 		{ id: 10, from: '4', to: 'A', type: 'solid' }, // Center to Bottom-left
-		{ id: 11, from: '2', to: 'A', type: 'solid' }, // Top-left center to Bottom-left
+		{ id: 11, from: '2', to: 'A', type: 'barrier' }, // Top-left center to Bottom-left
 		{ id: 12, from: '1', to: 'A', type: 'solid' }, // Top-left to Bottom-left
 		{ id: 13, from: '1', to: '2', type: 'solid' }, // Top-left to Top-left center
 		{ id: 14, from: '3', to: '2', type: 'solid' }, // Top-right to Top-left center

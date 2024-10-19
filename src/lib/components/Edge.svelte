@@ -2,11 +2,11 @@
 	// Two points: (x1, y1) and (x2, y2)
 	export let from = { x1: 0, y1: 0 };
 	export let to = { x2: 0, y2: 0 };
+	export let type;
 
 	// Define the types and initialize the current type
 	const types = ['solid', 'dashed', 'barrier'];
-	let currentTypeIndex = 0;
-	let type = types[currentTypeIndex];
+	let currentTypeIndex = types.indexOf(type);
 
 	// Calculate width and height of the SVG container based on node positions
 	let width = Math.abs(to.x2 - from.x1);
