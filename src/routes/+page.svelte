@@ -5,6 +5,12 @@
 	import VehicleParameters from '../lib/components/VehicleParameters.svelte';
 	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
+	import { nodeStates, edgeStates } from '../lib/stores.js';
+
+	function resetGraph() {
+		nodeStates.set({});
+		edgeStates.set({});
+	}
 </script>
 
 <svelte:head>
@@ -13,13 +19,14 @@
 </svelte:head>
 
 <Container>
-	<!-- Left Pane -->
 	<div slot="left" class="left-pane">
-		<Title>Graph</Title>
+		<div class="title-reset-container">
+			<Title>Graph</Title>
+			<button on:click={resetGraph}>Reset graph</button>
+		</div>
 		<Graph />
 	</div>
 
-	<!-- Right Pane -->
 	<div slot="right" class="right-pane">
 		<Title>Dashboard</Title>
 
@@ -66,5 +73,24 @@
 		margin-top: 0;
 		margin-bottom: 1rem;
 		font-size: 1.2rem;
+	}
+
+	.title-reset-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+	}
+
+	button {
+		padding: 0.75rem;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		cursor: pointer;
+	}
+
+	button:hover {
+		background-color: #0056b3;
 	}
 </style>
