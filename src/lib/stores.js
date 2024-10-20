@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 
-// Store for node states: { [nodeId]: isObsticle }
+// Store for node states: { [nodeId]: { isObsticle, state } }
 export const nodeStates = writable({});
 
-// Store for edge states: { [edgeId]: type }
+// Store for edge states: { [edgeId]: { type, state } }
 export const edgeStates = writable({});
 
 // Store for vehicle parameters: { timeToTraverse, timeWithBarrier }

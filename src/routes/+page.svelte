@@ -14,17 +14,21 @@
 	}
 
 	function randomizeGraph() {
-		// Randomize node states
 		const randomNodes = {};
-		fixedNodes.forEach(node => {
-			randomNodes[node.id] = Math.random() < 0.3;
+		fixedNodes.forEach((node) => {
+			randomNodes[node.id] = {
+				isObsticle: Math.random() < 0.3,
+				explState: 'default'
+			};
 		});
 
-		// Randomize edge states
 		const edgeTypes = ['solid', 'dashed', 'barrier'];
 		const randomEdges = {};
-		fixedEdges.forEach(edge => {
-			randomEdges[edge.id] = edgeTypes[Math.floor(Math.random() * edgeTypes.length)];
+		fixedEdges.forEach((edge) => {
+			randomEdges[edge.id] = {
+				type: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
+				explState: 'default'
+			};
 		});
 
 		// Set the randomized node and edge states

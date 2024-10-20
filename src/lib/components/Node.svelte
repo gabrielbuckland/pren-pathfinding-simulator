@@ -1,18 +1,28 @@
 <script>
-	import { selectedEndpoint } from '../stores.js';
+	import { selectedEndpoint, nodeStates } from '../stores.js';
 
 	export let id = 0;
 	export let x = 0;
 	export let y = 0;
 	export let isObsticle = false;
+	export let explState = 'default';
 
 	function handleClick() {
 		isObsticle = !isObsticle;
+		nodeStates.update((states) => {
+			return {
+				...states,
+				[id]: {
+					...states[id],
+					isObsticle
+				}
+			};
+		});
 	}
 </script>
 
 <button
-	class="node {isObsticle ? 'obsticle' : ''}"
+	class="node {isObsticle ? 'obsticle' : ''} state-{explState}"
 	style="left: {x}px; top: {y}px"
 	on:click={handleClick}
 >
@@ -53,5 +63,25 @@
 
 	.selected-endpoint {
 		font-weight: bold;
+	}
+
+	.node.state-default {}
+
+	.node.state-visited {
+		background-color: green;
+		color: white;
+		outline: 2px solid green;
+	}
+
+	.node.state-probed {
+		background-color: yellow;
+		color: black;
+		outline: 2px solid yellow;
+	}
+
+	.node.state-restricted {
+		background-color: red;
+		color: white;
+		outline: 2px solid red;
 	}
 </style>

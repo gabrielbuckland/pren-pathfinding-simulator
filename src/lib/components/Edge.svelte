@@ -3,6 +3,7 @@
 	export let from = { x1: 0, y1: 0 };
 	export let to = { x2: 0, y2: 0 };
 	export let type;
+	export let explState;
 
 	// Define the types and initialize the current type
 	const types = ['solid', 'dashed', 'barrier'];
@@ -38,19 +39,22 @@
 		e.preventDefault();
 		currentTypeIndex = (currentTypeIndex + 1) % types.length;
 		type = types[currentTypeIndex];
+
+		edgeStates.update((states) => {
+			return {
+				...states,
+				[id]: {
+					...states[id],
+					type: currentType
+				}
+			};
+		});
 	}
 </script>
 
 <svg {width} {height} style="position: absolute; left: {left}px; top: {top}px;">
 	<!-- Draw the line directly between the nodes -->
-	<line
-		class={type}
-		x1={x1}
-		y1={y1}
-		x2={x2}
-		y2={y2}
-		on:click={(e) => handleClick(e)}
-	/>
+	<line class="{type} state-{explState}" {x1} {y1} {x2} {y2} on:click={(e) => handleClick(e)} />
 	{#if type === 'barrier'}
 		<!-- Draw the barrier symbol at the midpoint -->
 		<image
@@ -80,6 +84,22 @@
 
 	line.dashed {
 		stroke-dasharray: 10, 14;
+	}
+
+	line.state-default {
+		stroke: black;
+	}
+
+	line.state-visited {
+		stroke: green;
+	}
+
+	line.state-probed {
+		stroke: yellow;
+	}
+
+	line.state-restricted {
+		stroke: red;
 	}
 
 	image {

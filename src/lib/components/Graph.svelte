@@ -12,14 +12,21 @@
 
 <section class="graph">
 	{#each fixedNodes as node (node.id)}
-		<Node id={node.id} x={node.x} y={node.y} isObsticle={$nodeStates[node.id] || false} />
+		<Node
+			id={node.id}
+			x={node.x}
+			y={node.y}
+			isObsticle={$nodeStates[node.id]?.isObsticle || false}
+			explState={$nodeStates[node.id]?.explState || 'default'}
+		/>
 	{/each}
 
 	{#each fixedEdges as edge (edge.id)}
 		<Edge
 			from={{ x1: nodesById[edge.from].x, y1: nodesById[edge.from].y }}
 			to={{ x2: nodesById[edge.to].x, y2: nodesById[edge.to].y }}
-			type={$edgeStates[edge.id] || 'solid'}
+			type={$edgeStates[edge.id]?.type || 'solid'}
+			explState={$edgeStates[edge.id]?.explState || 'default'}
 		/>
 	{/each}
 </section>

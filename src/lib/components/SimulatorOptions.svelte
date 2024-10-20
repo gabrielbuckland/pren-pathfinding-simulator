@@ -6,7 +6,15 @@
 	let exportEnabled = false;
 	let selectedOption = 'interactive';
 
-	async function runSimulation() {}
+	async function runSimulation() {
+		nodeStates.set({
+			'1': { isObsticle: false, explState: 'visited' },
+		});
+
+		edgeStates.set({
+			'1': { type: 'solid', explState: 'visited' },
+		});
+	}
 
 	function exportResults(results) {
 		console.log('Exporting results:', results);
