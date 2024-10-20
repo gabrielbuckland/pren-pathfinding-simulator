@@ -6,18 +6,18 @@
 	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import { nodeStates, edgeStates } from '../lib/stores.js';
-	import { fixedNodes, fixedEdges } from '../lib/graphStructure.js';
+	import { fixedNodes, fixedEdges, defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 
 	function resetGraph() {
-		nodeStates.set({});
-		edgeStates.set({});
+		nodeStates.set(defaultNodeStates);
+		edgeStates.set(defaultEdgeStates);
 	}
 
 	function randomizeGraph() {
 		const randomNodes = {};
 		fixedNodes.forEach((node) => {
 			randomNodes[node.id] = {
-				isObsticle: Math.random() < 0.3,
+				isObstacle: Math.random() < 0.3,
 				explState: 'default'
 			};
 		});

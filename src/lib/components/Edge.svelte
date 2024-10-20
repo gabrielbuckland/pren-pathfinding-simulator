@@ -1,5 +1,8 @@
 <script>
+	import { edgeStates } from '../stores.js';
+
 	// Two points: (x1, y1) and (x2, y2)
+	export let id;
 	export let from = { x1: 0, y1: 0 };
 	export let to = { x2: 0, y2: 0 };
 	export let type;
@@ -39,6 +42,18 @@
 		e.preventDefault();
 		currentTypeIndex = (currentTypeIndex + 1) % types.length;
 		type = types[currentTypeIndex];
+		console.log(currentTypeIndex);
+		console.log(type);
+
+		edgeStates.update((states) => {
+			return {
+				...states,
+				[id]: {
+					...states[id],
+					type: type
+				}
+			};
+		});
 	}
 </script>
 
@@ -46,7 +61,6 @@
 	<!-- Draw the line directly between the nodes -->
 	<line class="{type} state-{explState}" {x1} {y1} {x2} {y2} on:click={(e) => handleClick(e)} />
 	{#if type === 'barrier'}
-		<!-- Draw the barrier symbol at the midpoint -->
 		<image
 			href="/src/lib/images/barrier.png"
 			x={midX - barrierWidth / 2}

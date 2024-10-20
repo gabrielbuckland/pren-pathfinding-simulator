@@ -14,6 +14,17 @@ export const fixedNodes = [
 	{ id: '2', x: 230, y: 170 }
 ];
 
+export const defaultNodeStates = {
+	'4': { isObstacle: false, explState: 'default' },
+	'S': { isObstacle: false, explState: 'default' },
+	'3': { isObstacle: false, explState: 'default' },
+	'C': { isObstacle: false, explState: 'default' },
+	'B': { isObstacle: false, explState: 'default' },
+	'A': { isObstacle: false, explState: 'default' },
+	'1': { isObstacle: false, explState: 'default' },
+	'2': { isObstacle: false, explState: 'default' }
+};
+
 export const fixedEdges = [
 	{ id: 1, from: '1', to: 'S' },
 	{ id: 2, from: 'S', to: '3' },
@@ -32,3 +43,22 @@ export const fixedEdges = [
 	{ id: 15, from: 'S', to: '2' },
 	{ id: 16, from: '2', to: '4' }
 ];
+
+export const defaultEdgeStates = {
+	1: { type: 'solid', explState: 'default' },
+	2: { type: 'solid', explState: 'default' },
+	3: { type: 'solid', explState: 'default' },
+	4: { type: 'solid', explState: 'default' },
+	5: { type: 'solid', explState: 'default' },
+	6: { type: 'solid', explState: 'default' },
+	7: { type: 'solid', explState: 'default' },
+	8: { type: 'solid', explState: 'default' },
+	9: { type: 'solid', explState: 'default' },
+	10: { type: 'solid', explState: 'default' },
+	11: { type: 'solid', explState: 'default' },
+	12: { type: 'solid', explState: 'default' },
+	13: { type: 'solid', explState: 'default' },
+	14: { type: 'solid', explState: 'default' },
+	15: { type: 'solid', explState: 'default' },
+	16: { type: 'solid', explState: 'default' }
+};

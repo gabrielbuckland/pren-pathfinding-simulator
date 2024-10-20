@@ -1,10 +1,11 @@
 import { writable } from 'svelte/store';
+import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 
-// Store for node states: { [nodeId]: { isObsticle, state } }
-export const nodeStates = writable({});
+// Store for node states: { [nodeId]: { isObstacle, explState } }
+export const nodeStates = writable(defaultNodeStates);
 
-// Store for edge states: { [edgeId]: { type, state } }
-export const edgeStates = writable({});
+// Store for edge states: { [edgeId]: { type, explState } }
+export const edgeStates = writable(defaultEdgeStates);
 
 // Store for vehicle parameters: { timeToTraverse, timeWithBarrier }
 export const vehicleParameters = writable({
