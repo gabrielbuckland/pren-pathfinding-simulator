@@ -1,15 +1,22 @@
 <script>
 	import { edgeStates } from '../stores.js';
+	import { get } from 'svelte/store';
 
-	// Two points: (x1, y1) and (x2, y2)
+	// Exported props
 	export let id;
 	export let from = { x1: 0, y1: 0 };
 	export let to = { x2: 0, y2: 0 };
-	export let type;
+	export let type; // Initial type from props
 	export let explState;
 
-	// Define the types and initialize the current type
+	// Define the types
 	const types = ['solid', 'dashed', 'barrier'];
+
+	// Reactive statement to compute currentType
+	$: currentType = $edgeStates[id]?.type || type || 'solid';
+
+	// Reactive statement to compute currentExplState
+	$: currentExplState = $edgeStates[id]?.state || explState || 'default';
 
 	// Calculate width and height of the SVG container based on node positions
 	let width = Math.abs(to.x2 - from.x1);
@@ -39,20 +46,24 @@
 	function handleClick(e) {
 		e.preventDefault();
 
-		// Get the edge state from the store
-		let edgeState = $edgeStates[id] || {};
-		let type = edgeState.type || type || 'solid';
-		let currentTypeIndex = types.indexOf(type);
+		console.log(currentType);
 
+		// Get the current type index
+		let currentTypeIndex = types.indexOf(currentType);
+
+		// Cycle to the next type
 		currentTypeIndex = (currentTypeIndex + 1) % types.length;
-		type = types[currentTypeIndex];
+		let newType = types[currentTypeIndex];
 
+		console.log(newType);
+
+		// Update the edgeStates store
 		edgeStates.update((states) => {
 			return {
 				...states,
 				[id]: {
 					...states[id],
-					type: type
+					type: newType
 				}
 			};
 		});
@@ -61,15 +72,15 @@
 
 <svg {width} {height} style="position: absolute; left: {left}px; top: {top}px;">
 	<!-- Draw the line directly between the nodes -->
-	<line class="{type} state-{explState}" {x1} {y1} {x2} {y2} on:click={(e) => handleClick(e)} />
-	{#if type === 'barrier'}
+	<line class="{currentType} state-{currentExplState}" {x1} {y1} {x2} {y2} on:click={handleClick} />
+	{#if currentType === 'barrier'}
 		<image
 			href="/src/lib/images/barrier.png"
 			x={midX - barrierWidth / 2}
 			y={midY - barrierHeight / 2}
 			width={barrierWidth}
 			height={barrierHeight}
-			on:click={(e) => handleClick(e)}
+			on:click={handleClick}
 		/>
 	{/if}
 </svg>
