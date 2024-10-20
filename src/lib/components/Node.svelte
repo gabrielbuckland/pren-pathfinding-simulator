@@ -1,4 +1,6 @@
 <script>
+	import { selectedEndpoint } from '../stores.js';
+
 	export let id = 0;
 	export let x = 0;
 	export let y = 0;
@@ -14,7 +16,7 @@
 	style="left: {x}px; top: {y}px"
 	on:click={handleClick}
 >
-	<span>{id}</span>
+	<span class:selected-endpoint={id === $selectedEndpoint}>{id}</span>
 </button>
 
 <style>
@@ -47,5 +49,9 @@
 		font-weight: 700;
 		text-shadow: 0 0 0.8rem black;
 		transform: translate(-50%, -75%);
+	}
+
+	.selected-endpoint {
+		font-weight: bold;
 	}
 </style>

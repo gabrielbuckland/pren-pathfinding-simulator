@@ -1,14 +1,12 @@
 <script>
-	import { nodeStates, edgeStates } from '../stores.js';
+	import { nodeStates, edgeStates, selectedEndpoint } from '../stores.js';
 	import { get } from 'svelte/store';
 
 	let numGraphs = 1;
 	let exportEnabled = false;
 	let selectedOption = 'interactive';
 
-	async function runSimulation() {
-
-	}
+	async function runSimulation() {}
 
 	function exportResults(results) {
 		console.log('Exporting results:', results);
@@ -22,8 +20,31 @@
 <div class="simulator-options">
 	<label>
 		Number of graphs to test:
-		<input type="number" min="1" disabled={selectedOption === 'interactive'} bind:value={numGraphs} />
+		<input
+			type="number"
+			min="1"
+			disabled={selectedOption === 'interactive'}
+			bind:value={numGraphs}
+		/>
 	</label>
+
+	<div class="endpoint-selection">
+		<label>Select endpoint:</label>
+		<div class="radio-buttons">
+			<label>
+				<input type="radio" name="endpoint" value="A" bind:group={$selectedEndpoint} />
+				A
+			</label>
+			<label>
+				<input type="radio" name="endpoint" value="B" bind:group={$selectedEndpoint} />
+				B
+			</label>
+			<label>
+				<input type="radio" name="endpoint" value="C" bind:group={$selectedEndpoint} />
+				C
+			</label>
+		</div>
+	</div>
 
 	<label class="checkbox-label">
 		<input type="checkbox" bind:checked={exportEnabled} />
@@ -33,12 +54,14 @@
 	<div class="segmented-button">
 		<button
 			class:selected={selectedOption === 'interactive'}
-			on:click={() => selectOption('interactive')}>
+			on:click={() => selectOption('interactive')}
+		>
 			Interactive run
 		</button>
 		<button
 			class:selected={selectedOption === 'parameterized'}
-			on:click={() => selectOption('parameterized')}>
+			on:click={() => selectOption('parameterized')}
+		>
 			Parameterized run
 		</button>
 	</div>
@@ -79,6 +102,25 @@
 
 	.bold {
 		font-weight: bold;
+	}
+
+	.endpoint-selection {
+		margin-bottom: 1rem;
+	}
+
+	.radio-buttons {
+		display: flex;
+		gap: 1rem;
+		margin-top: 0.5rem;
+	}
+
+	.radio-buttons label {
+		display: flex;
+		align-items: center;
+	}
+
+	.radio-buttons input[type='radio'] {
+		margin-right: 0.5rem;
 	}
 
 	label {

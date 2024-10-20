@@ -6,10 +6,30 @@
 	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import { nodeStates, edgeStates } from '../lib/stores.js';
+	import { fixedNodes, fixedEdges } from '../lib/graphStructure.js';
 
 	function resetGraph() {
 		nodeStates.set({});
 		edgeStates.set({});
+	}
+
+	function randomizeGraph() {
+		// Randomize node states
+		const randomNodes = {};
+		fixedNodes.forEach(node => {
+			randomNodes[node.id] = Math.random() < 0.3;
+		});
+
+		// Randomize edge states
+		const edgeTypes = ['solid', 'dashed', 'barrier'];
+		const randomEdges = {};
+		fixedEdges.forEach(edge => {
+			randomEdges[edge.id] = edgeTypes[Math.floor(Math.random() * edgeTypes.length)];
+		});
+
+		// Set the randomized node and edge states
+		nodeStates.set(randomNodes);
+		edgeStates.set(randomEdges);
 	}
 </script>
 
@@ -22,7 +42,10 @@
 	<div slot="left" class="left-pane">
 		<div class="title-reset-container">
 			<Title>Graph</Title>
-			<button on:click={resetGraph}>Reset graph</button>
+			<div class="button-container">
+				<button class="randomize-btn" on:click={randomizeGraph}>Randomized graph</button>
+				<button on:click={resetGraph}>Reset graph</button>
+			</div>
 		</div>
 		<Graph />
 	</div>
@@ -82,6 +105,11 @@
 		width: 100%;
 	}
 
+	.button-container {
+		display: flex;
+		gap: 0.5rem;
+	}
+
 	button {
 		padding: 0.75rem;
 		background-color: #007bff;
@@ -92,5 +120,13 @@
 
 	button:hover {
 		background-color: #0056b3;
+	}
+
+	.randomize-btn {
+		background-color: #6c757d;
+	}
+
+	.randomize-btn:hover {
+		background-color: #5a6268;
 	}
 </style>

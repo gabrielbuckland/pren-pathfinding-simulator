@@ -12,3 +12,6 @@ export const vehicleParameters = writable({
 	timeToTraverse: 1.0,
 	timeWithBarrier: 2.0
 });
+
+// Store for selected endpoint (one of 'A', 'B', 'C')
+export const selectedEndpoint = writable('A'); // Default to 'A' or set as needed
