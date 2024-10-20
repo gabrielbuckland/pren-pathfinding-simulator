@@ -1,4 +1,3 @@
-<!-- src/lib/Graph.svelte -->
 <script>
 	import Edge from './Edge.svelte';
 	import Node from './Node.svelte';
