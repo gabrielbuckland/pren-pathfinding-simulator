@@ -1,5 +1,5 @@
 <script>
-	import { selectedEndpoint, nodeStates } from '../stores.js';
+	import { selectedEndpoint } from '../stores.js';
 
 	export let id = 0;
 	export let x = 0;
@@ -9,15 +9,6 @@
 
 	function handleClick() {
 		isObsticle = !isObsticle;
-		nodeStates.update((states) => {
-			return {
-				...states,
-				[id]: {
-					...states[id],
-					isObsticle
-				}
-			};
-		});
 	}
 </script>
 
@@ -83,5 +74,11 @@
 		background-color: red;
 		color: white;
 		outline: 2px solid red;
+	}
+
+	.node.state-finished {
+		background-color: blue;
+		color: white;
+		outline: 2px solid blue;
 	}
 </style>

@@ -1,11 +1,28 @@
 <script>
-	import { nodeStates, edgeStates, selectedEndpoint } from '../stores.js';
+	import { nodeStates, edgeStates, selectedEndpoint, vehicleParameters } from '../stores.js';
+	import { runAlgorithm } from '../algorithms.js';
 	import { get } from 'svelte/store';
 
 	let numGraphs = 1;
 	let exportEnabled = false;
 	let selectedOption = 'interactive';
 
+	async function runSimulation() {
+		nodeStates.set({});
+		edgeStates.set({});
+
+		if (selectedOption === 'interactive') {
+			try {
+				await runAlgorithm();
+				console.log('Simulation completed');
+			} catch (error) {
+				console.error('Error running simulation:', error);
+			}
+		} else if (selectedOption === 'parameterized') {
+			console.log('Parameterized run is not yet implemented.');
+		}
+	}
+	/*
 	async function runSimulation() {
 		nodeStates.set({
 			'1': { isObsticle: false, explState: 'visited' },
@@ -15,7 +32,7 @@
 			'1': { type: 'solid', explState: 'visited' },
 		});
 	}
-
+*/
 	function exportResults(results) {
 		console.log('Exporting results:', results);
 	}

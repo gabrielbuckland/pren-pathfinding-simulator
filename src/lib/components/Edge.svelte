@@ -39,16 +39,6 @@
 		e.preventDefault();
 		currentTypeIndex = (currentTypeIndex + 1) % types.length;
 		type = types[currentTypeIndex];
-
-		edgeStates.update((states) => {
-			return {
-				...states,
-				[id]: {
-					...states[id],
-					type: currentType
-				}
-			};
-		});
 	}
 </script>
 
@@ -100,6 +90,10 @@
 
 	line.state-restricted {
 		stroke: red;
+	}
+
+	line.state-finished {
+		stroke: blue;
 	}
 
 	image {

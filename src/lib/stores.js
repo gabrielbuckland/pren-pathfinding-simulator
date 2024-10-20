@@ -13,4 +13,4 @@ export const vehicleParameters = writable({
 });
 
 // Store for selected endpoint (one of 'A', 'B', 'C')
-export const selectedEndpoint = writable('A'); // Default to 'A' or set as needed
+export const selectedEndpoint = writable('A');

@@ -31,7 +31,6 @@
 			};
 		});
 
-		// Set the randomized node and edge states
 		nodeStates.set(randomNodes);
 		edgeStates.set(randomEdges);
 	}
