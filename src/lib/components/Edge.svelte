@@ -10,7 +10,6 @@
 
 	// Define the types and initialize the current type
 	const types = ['solid', 'dashed', 'barrier'];
-	let currentTypeIndex = types.indexOf(type);
 
 	// Calculate width and height of the SVG container based on node positions
 	let width = Math.abs(to.x2 - from.x1);
@@ -34,16 +33,19 @@
 	$: midX = (x1 + x2) / 2;
 	$: midY = (y1 + y2) / 2;
 
-	// Barrier symbol dimensions
 	const barrierWidth = 40;
 	const barrierHeight = 40;
 
 	function handleClick(e) {
 		e.preventDefault();
+
+		// Get the edge state from the store
+		let edgeState = $edgeStates[id] || {};
+		let type = edgeState.type || type || 'solid';
+		let currentTypeIndex = types.indexOf(type);
+
 		currentTypeIndex = (currentTypeIndex + 1) % types.length;
 		type = types[currentTypeIndex];
-		console.log(currentTypeIndex);
-		console.log(type);
 
 		edgeStates.update((states) => {
 			return {
