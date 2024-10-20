@@ -1,18 +1,41 @@
 <script>
-	let timeToTraverse = 1.0;
-	let timeWithBarrier = 2.0;
+	import { vehicleParameters } from '../stores.js';
+
+	let timeToTraverse;
+	let timeWithBarrier;
+
+	vehicleParameters.subscribe((params) => {
+		timeToTraverse = params.timeToTraverse;
+		timeWithBarrier = params.timeWithBarrier;
+	});
+
+	function updateVehicleParameters() {
+		vehicleParameters.set({ timeToTraverse, timeWithBarrier });
+	}
 </script>
 
 <div class="vehicle-parameters">
 	<div class="row">
 		<label>
 			Time to traverse edge (cm/s):
-			<input type="number" min="0" step="0.1" bind:value={timeToTraverse} />
+			<input
+				type="number"
+				min="0"
+				step="0.1"
+				bind:value={timeToTraverse}
+				on:input={updateVehicleParameters}
+			/>
 		</label>
 
 		<label>
 			Time to traverse edge with barrier (cm/s):
-			<input type="number" min="0" step="0.1" bind:value={timeWithBarrier} />
+			<input
+				type="number"
+				min="0"
+				step="0.1"
+				bind:value={timeWithBarrier}
+				on:input={updateVehicleParameters}
+			/>
 		</label>
 	</div>
 </div>
