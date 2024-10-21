@@ -15,3 +15,6 @@ export const vehicleParameters = writable({
 
 // Store for selected endpoint (one of 'A', 'B', 'C')
 export const selectedEndpoint = writable('A');
+
+// Store for selectedAlgorithm
+export const selectedAlgorithm = writable('A*');

@@ -1,12 +1,42 @@
-import { nodeStates, edgeStates, selectedEndpoint } from './stores.js';
+import { nodeStates, edgeStates } from './stores.js';
 import { fixedEdges } from './graphStructure.js';
-import { get } from 'svelte/store';
 
-export async function runAlgorithm() {
-	console.log('Running algorithm');
+export async function runAlgorithm(algorithmName, endpoint, vehicleParams) {
+	console.log('Running algorithm:', algorithmName);
 
+	const algorithms = {
+		'A*': runAStarAlgorithm,
+		'D*': runDStarAlgorithm,
+		'D*Lite': runDStarLiteAlgorithm
+	};
+
+	const algorithm = algorithms[algorithmName];
+
+	if (!algorithm) {
+		throw new Error(`Algorithm ${algorithmName} not found`);
+	}
+
+	await algorithm(endpoint, vehicleParams);
+}
+
+async function runAStarAlgorithm(endpoint, vehicleParams) {
+	console.log('Running A* algorithm with endpoint:', endpoint);
+	await simulateAlgorithm(endpoint, vehicleParams);
+}
+
+async function runDStarAlgorithm(endpoint, vehicleParams) {
+	console.log('Running D* algorithm with endpoint:', endpoint);
+	await simulateAlgorithm(endpoint, vehicleParams);
+}
+
+async function runDStarLiteAlgorithm(endpoint, vehicleParams) {
+	console.log('Running D* Lite algorithm with endpoint:', endpoint);
+	await simulateAlgorithm(endpoint, vehicleParams);
+}
+
+async function simulateAlgorithm(endpoint, vehicleParams) {
 	const startNodeId = 'S';
-	const goalNodeId = get(selectedEndpoint);
+	const goalNodeId = endpoint;
 
 	let queue = [startNodeId];
 	let visitedNodes = new Set();
@@ -17,20 +47,18 @@ export async function runAlgorithm() {
 		visitedNodes.add(currentNodeId);
 
 		// Mark node as visited
-		nodeStates.update(states => {
-			return {
-				...states,
-				[currentNodeId]: {
-					...(states[currentNodeId] || {}),
-					explState: 'visited'
-				}
-			};
-		});
+		nodeStates.update((states) => ({
+			...states,
+			[currentNodeId]: {
+				...(states[currentNodeId] || {}),
+				explState: 'visited'
+			}
+		}));
 
 		await delay(250);
 
 		if (currentNodeId === goalNodeId) {
-			await highlightPath(cameFrom, currentNodeId);
+			await highlightPath(cameFrom, currentNodeId, vehicleParams);
 			return;
 		}
 
@@ -42,15 +70,13 @@ export async function runAlgorithm() {
 				cameFrom[neighborId] = currentNodeId;
 
 				const edgeId = getEdgeId(currentNodeId, neighborId);
-				edgeStates.update(states => {
-					return {
-						...states,
-						[edgeId]: {
-							...(states[edgeId] || {}),
-							explState: 'probed'
-						}
-					};
-				});
+				edgeStates.update((states) => ({
+					...states,
+					[edgeId]: {
+						...(states[edgeId] || {}),
+						explState: 'probed'
+					}
+				}));
 
 				await delay(250);
 			}
@@ -61,7 +87,7 @@ export async function runAlgorithm() {
 }
 
 function delay(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Helper function to get neighbors of a node

@@ -1,11 +1,11 @@
 <script>
+	import { selectedAlgorithm } from '../stores.js';
 	let algorithms = ['A*', 'D*', 'D*Lite'];
-	let selectedAlgorithm = algorithms[0];
 </script>
 
 <div class="algorithm-selection">
 	<label for="algorithm-select">Algorithm to apply:</label>
-	<select id="algorithm-select" bind:value={selectedAlgorithm}>
+	<select id="algorithm-select" bind:value={$selectedAlgorithm}>
 		{#each algorithms as algorithm}
 			<option value={algorithm}>{algorithm}</option>
 		{/each}
