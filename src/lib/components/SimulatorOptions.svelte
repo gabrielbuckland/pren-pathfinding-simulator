@@ -8,13 +8,6 @@
 	let selectedOption = 'interactive';
 
 	async function runSimulation() {
-		console.log(get(edgeStates))
-		console.log(get(nodeStates))
-
-		/*
-		nodeStates.set({});
-		edgeStates.set({});
-
 		if (selectedOption === 'interactive') {
 			try {
 				await runAlgorithm();
@@ -25,19 +18,9 @@
 		} else if (selectedOption === 'parameterized') {
 			console.log('Parameterized run is not yet implemented.');
 		}
-		*/
-	}
-	/*
-	async function runSimulation() {
-		nodeStates.set({
-			'1': { isObstacle: false, explState: 'visited' },
-		});
 
-		edgeStates.set({
-			'1': { type: 'solid', explState: 'visited' },
-		});
 	}
-*/
+
 	function exportResults(results) {
 		console.log('Exporting results:', results);
 	}

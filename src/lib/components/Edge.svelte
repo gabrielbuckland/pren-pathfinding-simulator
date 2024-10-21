@@ -2,7 +2,6 @@
 	import { edgeStates } from '../stores.js';
 	import { get } from 'svelte/store';
 
-	// Exported props
 	export let id;
 	export let from = { x1: 0, y1: 0 };
 	export let to = { x2: 0, y2: 0 };
@@ -46,18 +45,10 @@
 	function handleClick(e) {
 		e.preventDefault();
 
-		console.log(currentType);
-
-		// Get the current type index
 		let currentTypeIndex = types.indexOf(currentType);
-
-		// Cycle to the next type
 		currentTypeIndex = (currentTypeIndex + 1) % types.length;
 		let newType = types[currentTypeIndex];
 
-		console.log(newType);
-
-		// Update the edgeStates store
 		edgeStates.update((states) => {
 			return {
 				...states,

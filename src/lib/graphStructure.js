@@ -37,11 +37,10 @@ export const fixedEdges = [
 	{ id: 9, from: '4', to: 'B' },
 	{ id: 10, from: '4', to: 'A' },
 	{ id: 11, from: '2', to: 'A' },
-	{ id: 12, from: '1', to: 'A' },
-	{ id: 13, from: '1', to: '2' },
-	{ id: 14, from: '3', to: '2' },
-	{ id: 15, from: 'S', to: '2' },
-	{ id: 16, from: '2', to: '4' }
+	{ id: 12, from: '1', to: '2' },
+	{ id: 13, from: '3', to: '2' },
+	{ id: 14, from: 'S', to: '2' },
+	{ id: 15, from: '2', to: '4' }
 ];
 
 export const defaultEdgeStates = {
@@ -59,6 +58,5 @@ export const defaultEdgeStates = {
 	12: { type: 'solid', explState: 'default' },
 	13: { type: 'solid', explState: 'default' },
 	14: { type: 'solid', explState: 'default' },
-	15: { type: 'solid', explState: 'default' },
-	16: { type: 'solid', explState: 'default' }
+	15: { type: 'solid', explState: 'default' }
 };
