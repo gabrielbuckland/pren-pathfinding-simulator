@@ -17,9 +17,10 @@
 		if (selectedOption === 'interactive') {
 			try {
 				const algorithmName = get(selectedAlgorithm);
+				const startpoint = 'S';
 				const endpoint = get(selectedEndpoint);
 				const vehicleParams = get(vehicleParameters);
-				await runAlgorithm(algorithmName, endpoint, vehicleParams);
+				await runAlgorithm(algorithmName, startpoint, endpoint, vehicleParams);
 				console.log('Simulation completed');
 			} catch (error) {
 				console.error('Error running simulation:', error);
