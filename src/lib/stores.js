@@ -18,3 +18,6 @@ export const selectedEndpoint = writable('A');
 
 // Store for selectedAlgorithm
 export const selectedAlgorithm = writable('A*');
+
+// New store for animation speed (in milliseconds)
+export const animationSpeed = writable(250);

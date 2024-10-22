@@ -4,7 +4,8 @@
 		edgeStates,
 		selectedEndpoint,
 		vehicleParameters,
-		selectedAlgorithm
+		selectedAlgorithm,
+		animationSpeed
 	} from '../stores.js';
 	import { runAlgorithm } from '../algorithms.js';
 	import { get } from 'svelte/store';
@@ -20,7 +21,9 @@
 				const startpoint = 'S';
 				const endpoint = get(selectedEndpoint);
 				const vehicleParams = get(vehicleParameters);
-				await runAlgorithm(algorithmName, startpoint, endpoint, vehicleParams);
+				const animationMs = get(animationSpeed);
+
+				await runAlgorithm(algorithmName, startpoint, endpoint, vehicleParams, animationMs);
 				console.log('Simulation completed');
 			} catch (error) {
 				console.error('Error running simulation:', error);
@@ -71,6 +74,11 @@
 	<label class="checkbox-label">
 		<input type="checkbox" bind:checked={exportEnabled} />
 		Create export
+	</label>
+
+	<label>
+		Animation Speed (ms):
+		<input type="number" min="0" bind:value={$animationSpeed} />
 	</label>
 
 	<div class="segmented-button">

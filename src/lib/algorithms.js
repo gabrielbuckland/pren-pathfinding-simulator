@@ -2,7 +2,7 @@ import { nodeStates, edgeStates } from './stores.js';
 import { fixedEdges } from './graphStructure.js';
 import { get } from 'svelte/store';
 
-export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicleParams) {
+export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicleParams, animationMs) {
 	console.log('Running algorithm:', algorithmName);
 
 	const algorithms = {
@@ -17,34 +17,44 @@ export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicle
 		throw new Error(`Algorithm ${algorithmName} not found`);
 	}
 
-	await algorithm(startNodeId, endpoint, vehicleParams);
+	await algorithm(startNodeId, endpoint, vehicleParams, animationMs);
 }
 
-async function runAStarAlgorithm(startNodeId, goalNodeId, vehicleParams) {
+async function runAStarAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	console.log(`Running A* algorithm from ${startNodeId} to ${goalNodeId}`);
-	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams);
+	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
-async function runDStarAlgorithm(startNodeId, goalNodeId, vehicleParams) {
+
+async function runDStarAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	console.log(`Running D* algorithm from ${startNodeId} to ${goalNodeId}`);
-	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams);
+	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
-async function runDStarLiteAlgorithm(startNodeId, goalNodeId, vehicleParams) {
+
+async function runDStarLiteAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	console.log(`Running D*Lite algorithm from ${startNodeId} to ${goalNodeId}`);
-	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams);
+	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
-async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams) {
+async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	let queue = [startNodeId];
 	let visitedNodes = new Set();
-	visitedNodes.add(startNodeId); // Mark start node as visited
 	let cameFrom = {};
+
+	// Mark start node as 'probed'
+	nodeStates.update((states) => ({
+		...states,
+		[startNodeId]: {
+			...(states[startNodeId] || {}),
+			explState: 'probed',
+		},
+	}));
 
 	while (queue.length > 0) {
 		const currentNodeId = queue.shift();
 
-		// Update node state to 'visited'
+		// Mark node as 'visited'
 		nodeStates.update((states) => ({
 			...states,
 			[currentNodeId]: {
@@ -52,22 +62,57 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams) {
 				explState: 'visited',
 			},
 		}));
+		visitedNodes.add(currentNodeId);
 
-		await delay(250);
+		// Mark edge from parent to current node as 'visited'
+		if (cameFrom[currentNodeId]) {
+			const parentId = cameFrom[currentNodeId];
+			const edgeId = getEdgeId(parentId, currentNodeId);
+			edgeStates.update((states) => ({
+				...states,
+				[edgeId]: {
+					...(states[edgeId] || {}),
+					explState: 'visited',
+				},
+			}));
+		}
+
+		await delay(animationMs);
 
 		if (currentNodeId === goalNodeId) {
+			// Mark goal node as 'finished'
+			nodeStates.update((states) => ({
+				...states,
+				[currentNodeId]: {
+					...(states[currentNodeId] || {}),
+					explState: 'finished',
+				},
+			}));
+			console.log('Reached goal node.');
 			await highlightPath(cameFrom, currentNodeId, vehicleParams);
 			return;
 		}
 
 		const neighbors = getNeighbors(currentNodeId);
-
 		for (const neighborId of neighbors) {
-			if (!visitedNodes.has(neighborId)) {
-				visitedNodes.add(neighborId);
-				queue.push(neighborId);
-				cameFrom[neighborId] = currentNodeId;
+			const neighborState = get(nodeStates)[neighborId];
+			const neighborExplState = neighborState?.explState;
 
+			if (
+				!visitedNodes.has(neighborId) &&
+				neighborExplState !== 'probed' &&
+				neighborExplState !== 'restricted'
+			) {
+				// Mark neighbor as 'probed'
+				nodeStates.update((states) => ({
+					...states,
+					[neighborId]: {
+						...(states[neighborId] || {}),
+						explState: 'probed',
+					},
+				}));
+
+				// Mark edge as 'probed'
 				const edgeId = getEdgeId(currentNodeId, neighborId);
 				edgeStates.update((states) => ({
 					...states,
@@ -77,7 +122,10 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams) {
 					},
 				}));
 
-				await delay(250);
+				queue.push(neighborId);
+				cameFrom[neighborId] = currentNodeId;
+
+				await delay(animationMs);
 			}
 		}
 	}
@@ -97,34 +145,38 @@ function getNeighbors(nodeId) {
 	for (const edge of fixedEdges) {
 		const isDashed = currentEdgeStates[edge.id]?.type === 'dashed';
 		if (isDashed) {
-			// Edge is dashed, cannot traverse
 			continue;
 		}
 
+		let neighborId = null;
 		if (edge.from === nodeId) {
-			const neighborId = edge.to;
-			const isObstacle = currentNodeStates[neighborId]?.isObstacle;
-			if (!isObstacle) {
-				neighbors.push(neighborId);
-			} else {
-				// Mark edges from obstacle nodes as restricted
-				markEdgesFromObstacleNode(neighborId);
-			}
+			neighborId = edge.to;
 		} else if (edge.to === nodeId) {
-			const neighborId = edge.from;
+			neighborId = edge.from;
+		}
+
+		if (neighborId) {
 			const isObstacle = currentNodeStates[neighborId]?.isObstacle;
-			if (!isObstacle) {
-				neighbors.push(neighborId);
-			} else {
-				// Mark edges from obstacle nodes as restricted
-				markEdgesFromObstacleNode(neighborId);
+			if (isObstacle) {
+				markNodeAndEdgesRestricted(neighborId);
+				continue;
 			}
+
+			neighbors.push(neighborId);
 		}
 	}
 	return neighbors;
 }
 
-function markEdgesFromObstacleNode(nodeId) {
+function markNodeAndEdgesRestricted(nodeId) {
+	nodeStates.update((states) => ({
+		...states,
+		[nodeId]: {
+			...(states[nodeId] || {}),
+			explState: 'restricted',
+		},
+	}));
+
 	const connectedEdges = fixedEdges.filter(
 		(edge) => edge.from === nodeId || edge.to === nodeId
 	);
@@ -160,38 +212,18 @@ async function highlightPath(cameFrom, currentNodeId, vehicleParams) {
 		path.unshift(currentNodeId);
 	}
 
-	// Calculate total traversal time
 	let totalTime = 0;
 
-	for (let i = 0; i < path.length; i++) {
-		const nodeId = path[i];
-		nodeStates.update((states) => ({
-			...states,
-			[nodeId]: {
-				...(states[nodeId] || {}),
-				explState: 'finished',
-			},
-		}));
-
-		if (i > 0) {
-			const edgeId = getEdgeId(path[i - 1], nodeId);
-			const edgeState = get(edgeStates)[edgeId];
-			const traversalTime =
-				edgeState.type === 'barrier'
-					? vehicleParams.timeWithBarrier
-					: vehicleParams.timeToTraverse;
-			totalTime += traversalTime;
-
-			edgeStates.update((states) => ({
-				...states,
-				[edgeId]: {
-					...(states[edgeId] || {}),
-					explState: 'finished',
-				},
-			}));
-		}
-
-		await delay(250);
+	for (let i = 1; i < path.length; i++) {
+		const fromNodeId = path[i - 1];
+		const toNodeId = path[i];
+		const edgeId = getEdgeId(fromNodeId, toNodeId);
+		const edgeState = get(edgeStates)[edgeId];
+		const traversalTime =
+			edgeState.type === 'barrier'
+				? vehicleParams.timeWithBarrier
+				: vehicleParams.timeToTraverse;
+		totalTime += traversalTime;
 	}
 
 	console.log(`Total traversal time: ${totalTime} units`);
