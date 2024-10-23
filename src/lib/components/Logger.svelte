@@ -68,7 +68,7 @@
 
 	.log-messages {
 		margin-top: 1rem;
-		max-height: 300px;
+		max-height: 400px;
 		overflow-y: auto;
 		background-color: #fff;
 		padding: 0.5rem;

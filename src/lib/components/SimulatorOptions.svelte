@@ -9,6 +9,7 @@
 	} from '../stores.js';
 	import { runAlgorithm } from '../algorithms.js';
 	import { get } from 'svelte/store';
+	import { resetExplorationStates } from '../utils.js';
 
 	let numGraphs = 1;
 	let exportEnabled = false;
@@ -17,6 +18,8 @@
 	async function runSimulation() {
 		if (selectedOption === 'interactive') {
 			try {
+				resetExplorationStates();
+
 				const algorithmName = get(selectedAlgorithm);
 				const startpoint = 'S';
 				const endpoint = get(selectedEndpoint);
