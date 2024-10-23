@@ -5,8 +5,14 @@
 	import VehicleParameters from '../lib/components/VehicleParameters.svelte';
 	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
+	import Logger from '../lib/components/Logger.svelte';
 	import { nodeStates, edgeStates } from '../lib/stores.js';
-	import { fixedNodes, fixedEdges, defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
+	import {
+		fixedNodes,
+		fixedEdges,
+		defaultNodeStates,
+		defaultEdgeStates
+	} from '../lib/graphStructure.js';
 
 	function resetGraph() {
 		nodeStates.set(defaultNodeStates);
@@ -53,7 +59,7 @@
 		<Graph />
 	</div>
 
-	<div slot="right" class="right-pane">
+	<div slot="right-top" class="right-top-pane">
 		<Title>Dashboard</Title>
 
 		<div class="section">
@@ -71,6 +77,10 @@
 			<SimulatorOptions />
 		</div>
 	</div>
+
+	<div slot="right-bottom" class="right-bottom-pane">
+		<Logger />
+	</div>
 </Container>
 
 <style>
@@ -80,11 +90,14 @@
 		height: 100%;
 	}
 
-	.right-pane {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-		overflow-y: auto;
+	.right-top-pane {
+		padding: 0.5rem 1rem 1rem 1rem;
+		margin: 0;
+	}
+
+	.right-bottom-pane {
+		padding: 0;
+		margin: 0;
 	}
 
 	.section {

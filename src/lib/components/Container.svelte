@@ -1,14 +1,20 @@
-<!-- Container.svelte -->
 <div class="container">
-	<div class="pane">
-	  <slot name="left"></slot>
+	<div class="pane left-pane">
+		<slot name="left"></slot>
 	</div>
-	<div class="pane">
-	  <slot name="right"></slot>
+	<div class="pane right-pane">
+		<div class="right-pane-content">
+			<div class="right-top">
+				<slot name="right-top"></slot>
+			</div>
+			<div class="right-bottom">
+				<slot name="right-bottom"></slot>
+			</div>
+		</div>
 	</div>
-  </div>
+</div>
 
-  <style>
+<style>
 	.container {
 		display: flex;
 		width: 100%;
@@ -18,8 +24,40 @@
 
 	.pane {
 		flex: 1;
-		border: 2px solid #000;
 		box-sizing: border-box;
+		padding: 0; /* Remove padding */
+	}
+
+	.left-pane {
+		border-right: 2px solid #000;
+		border-left: 2px solid #000;
+		border-top: 2px solid #000;
+		border-bottom: 2px solid #000;
 		padding: 0.5rem 1rem 1rem 1rem;
 	}
-  </style>
+
+	.right-pane {
+		border-left: none;
+		border-right: 2px solid #000;
+		border-top: 2px solid #000;
+		border-bottom: 2px solid #000;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.right-pane-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.right-top {
+		flex: 0 0 60%;
+		overflow-y: auto;
+	}
+
+	.right-bottom {
+		flex: 0 0 40%;
+	}
+</style>

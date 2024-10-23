@@ -5,7 +5,7 @@
 	export let id;
 	export let from = { x1: 0, y1: 0 };
 	export let to = { x2: 0, y2: 0 };
-	export let type; // Initial type from props
+	export let type;
 	export let explState;
 
 	// Define the types

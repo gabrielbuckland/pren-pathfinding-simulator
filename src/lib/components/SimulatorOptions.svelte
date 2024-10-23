@@ -77,7 +77,7 @@
 	</label>
 
 	<label>
-		Animation Speed (ms):
+		Animation speed (ms):
 		<input type="number" min="0" bind:value={$animationSpeed} />
 	</label>
 

@@ -21,3 +21,6 @@ export const selectedAlgorithm = writable('A*');
 
 // New store for animation speed (in milliseconds)
 export const animationSpeed = writable(250);
+
+// New store for algorithm logs
+export const algorithmLogs = writable([]);
