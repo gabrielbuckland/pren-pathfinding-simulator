@@ -49,22 +49,13 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 
 	while (queue.length > 0) {
 		const currentNodeId = queue.shift();
-		addLog(`Visiting node ${currentNodeId}`, 'info');
-
-		// Mark node as 'visited'
-		nodeStates.update((states) => ({
-			...states,
-			[currentNodeId]: {
-				...(states[currentNodeId] || {}),
-				explState: 'visited',
-			},
-		}));
-		visitedNodes.add(currentNodeId);
 
 		// Mark edge from parent to current node as 'visited'
 		if (cameFrom[currentNodeId]) {
 			const parentId = cameFrom[currentNodeId];
 			const edgeId = getEdgeId(parentId, currentNodeId);
+
+			addLog(`Visiting edge ${edgeId} from node ${parentId} to node ${currentNodeId}`, 'info');
 			edgeStates.update((states) => ({
 				...states,
 				[edgeId]: {
@@ -73,6 +64,17 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 				},
 			}));
 		}
+
+		// Mark node as 'visited'
+		addLog(`Visiting node ${currentNodeId}`, 'info');
+		nodeStates.update((states) => ({
+			...states,
+			[currentNodeId]: {
+				...(states[currentNodeId] || {}),
+				explState: 'visited',
+			},
+		}));
+		visitedNodes.add(currentNodeId);
 
 		await delay(animationMs);
 
