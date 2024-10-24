@@ -145,10 +145,7 @@ function getNeighbors(nodeId) {
 
 	for (const edge of fixedEdges) {
 		const isDashed = currentEdgeStates[edge.id]?.type === 'dashed';
-		if (isDashed) {
-			markEdgeRestriced(edge.id);
-			continue;
-		}
+		if (isDashed) continue;
 
 		let neighborId = null;
 		if (edge.from === nodeId) {
@@ -226,6 +223,25 @@ async function highlightPath(cameFrom, currentNodeId, vehicleParams) {
 	while (currentNodeId in cameFrom) {
 		currentNodeId = cameFrom[currentNodeId];
 		path.unshift(currentNodeId);
+
+/*
+		nodeStates.update((states) => ({
+			...states,
+			[currentNodeId]: {
+				...(states[currentNodeId] || {}),
+				explState: 'finished',
+			},
+		}));
+
+		const edgeId = getEdgeId(currentNodeId, path[1]);
+		edgeStates.update((states) => ({
+			...states,
+			[edgeId]: {
+				...(states[edgeId] || {}),
+				explState: 'finished',
+			},
+		}));
+*/
 	}
 
 	let totalTime = 0;
