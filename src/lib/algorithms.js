@@ -145,7 +145,10 @@ function getNeighbors(nodeId) {
 
 	for (const edge of fixedEdges) {
 		const isDashed = currentEdgeStates[edge.id]?.type === 'dashed';
-		if (isDashed) continue;
+		if (isDashed) {
+			markEdgeRestriced(edge.id);
+			continue;
+		}
 
 		let neighborId = null;
 		if (edge.from === nodeId) {
@@ -167,7 +170,17 @@ function getNeighbors(nodeId) {
 	return neighbors;
 }
 
-function markNodeAndEdgesRestricted(nodeId) {
+function markEdgeRestriced(edgeId) {
+	edgeStates.update((states) => ({
+		...states,
+		[edgeId]: {
+			...(states[edgeId] || {}),
+			explState: 'restricted',
+		},
+	}));
+}
+
+function markNodeRestricted(nodeId) {
 	nodeStates.update((states) => ({
 		...states,
 		[nodeId]: {
@@ -175,6 +188,10 @@ function markNodeAndEdgesRestricted(nodeId) {
 			explState: 'restricted',
 		},
 	}));
+}
+
+function markNodeAndEdgesRestricted(nodeId) {
+	markNodeRestricted(nodeId);
 
 	const connectedEdges = fixedEdges.filter(
 		(edge) => edge.from === nodeId || edge.to === nodeId
