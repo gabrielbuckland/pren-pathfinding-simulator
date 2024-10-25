@@ -5,7 +5,8 @@
 		selectedEndpoint,
 		vehicleParameters,
 		selectedAlgorithm,
-		animationSpeed
+		animationSpeed,
+		executionMode
 	} from '../stores.js';
 	import { runAlgorithm } from '../algorithms.js';
 	import { get } from 'svelte/store';
@@ -13,7 +14,7 @@
 
 	let numGraphs = 1;
 	let exportEnabled = false;
-	let selectedOption = 'interactive';
+	let selectedOption = get(executionMode);
 
 	async function runSimulation() {
 		if (selectedOption === 'interactive') {
@@ -41,6 +42,7 @@
 
 	function selectOption(option) {
 		selectedOption = option;
+		executionMode.set(option);
 	}
 </script>
 
@@ -80,7 +82,12 @@
 
 	<label>
 		Animation speed (ms):
-		<input type="number" min="0" bind:value={$animationSpeed} />
+		<input
+			type="number"
+			min="0"
+			disabled={selectedOption === 'parameterized'}
+			bind:value={$animationSpeed}
+		/>
 	</label>
 
 	<div class="segmented-button">

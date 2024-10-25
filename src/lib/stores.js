@@ -19,6 +19,9 @@ export const selectedEndpoint = writable('A');
 // Store for selectedAlgorithm
 export const selectedAlgorithm = writable('A*');
 
+// Store execution mode (either 'interactive' or 'parameterized')
+export const executionMode = writable('interactive');
+
 // New store for animation speed (in milliseconds)
 export const animationSpeed = writable(250);
 
