@@ -24,3 +24,6 @@ export const animationSpeed = writable(250);
 
 // New store for algorithm logs
 export const algorithmLogs = writable([]);
+
+// New store for structured logs
+export const structuredLogs = writable([]);

@@ -1,25 +1,47 @@
 <script>
-	import { algorithmLogs } from '../stores.js';
+	import { algorithmLogs, structuredLogs } from '../stores.js';
 	import { onDestroy } from 'svelte';
+	import { get } from 'svelte/store';
 
 	let logs = [];
-	const unsubscribe = algorithmLogs.subscribe((value) => {
+	let structuredLogsData = [];
+
+	const unsubscribeReadableLogs = algorithmLogs.subscribe((value) => {
 		logs = value;
 	});
 
+	const unsubscribeStructuredLogs = structuredLogs.subscribe((value) => {
+		structuredLogsData = value;
+	});
+
 	onDestroy(() => {
-		unsubscribe();
+		unsubscribeReadableLogs();
+		unsubscribeStructuredLogs();
 	});
 
 	function clearLogs() {
 		algorithmLogs.set([]);
+	}
+
+	function clearStructuredLogs() {
+		structuredLogs.set([]);
+	}
+
+	function exportStructuredLogs() {
+		console.log(get(structuredLogs));
+		console.log('Exporting structured logs (not implemented yet)');
 	}
 </script>
 
 <div class="logger">
 	<div class="header">
 		<h1>Logs</h1>
-		<button class="clear-button" on:click={clearLogs}>Clear Logs</button>
+		<div class="controls">
+			<span>{structuredLogsData.length} logs collected</span>
+			<button class="clear-structured-logs-button" on:click={clearStructuredLogs}>Clear logs</button>
+			<button class="export-button" on:click={exportStructuredLogs}>Export logs</button>
+			<button class="clear-button" on:click={clearLogs}>Clear screen</button>
+		</div>
 	</div>
 
 	{#if logs.length > 0}
@@ -46,20 +68,28 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		flex-wrap: wrap;
 	}
 
-	.logger h1 {
+	.header h1 {
 		font-family: 'Poppins', sans-serif;
 		font-weight: 500;
 		margin: 0;
 	}
 
+	.controls {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
 	button {
-		padding: 0.75rem;
+		padding: 0.5rem 0.75rem;
 		background-color: #007bff;
 		color: #fff;
 		border: none;
 		cursor: pointer;
+		font-size: 0.9rem;
 	}
 
 	button:hover {

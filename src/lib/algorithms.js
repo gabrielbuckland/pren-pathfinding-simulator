@@ -1,6 +1,8 @@
 import { nodeStates, edgeStates, algorithmLogs } from './stores.js';
 import { fixedEdges } from './graphStructure.js';
 import { get } from 'svelte/store';
+import { addLog } from './logging.js';
+import { delay } from './utils.js';
 
 export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicleParams, animationMs) {
 	algorithmLogs.set([]);
@@ -136,10 +138,6 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 	addLog('Goal not reachable from the start node.', 'error');
 }
 
-function delay(ms) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function getNeighbors(nodeId) {
 	const neighbors = [];
 	const currentEdgeStates = get(edgeStates);
@@ -261,15 +259,4 @@ async function highlightPath(cameFrom, currentNodeId, vehicleParams) {
 	}
 
 	addLog(`Total traversal time: ${totalTime} units`, 'success');
-}
-
-function addLog(message, type = 'info') {
-	algorithmLogs.update((logs) => [
-		...logs,
-		{
-			timestamp: new Date().toLocaleTimeString(),
-			message,
-			type,
-		},
-	]);
 }

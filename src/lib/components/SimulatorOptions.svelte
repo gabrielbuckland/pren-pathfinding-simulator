@@ -27,7 +27,6 @@
 				const animationMs = get(animationSpeed);
 
 				await runAlgorithm(algorithmName, startpoint, endpoint, vehicleParams, animationMs);
-				console.log('Simulation completed');
 			} catch (error) {
 				console.error('Error running simulation:', error);
 			}
