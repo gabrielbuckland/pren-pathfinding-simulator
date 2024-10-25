@@ -23,12 +23,12 @@
 	}
 
 	.pane {
-		flex: 1;
 		box-sizing: border-box;
-		padding: 0; /* Remove padding */
+		padding: 0;
 	}
 
 	.left-pane {
+		flex: 0 0 40%;
 		border-right: 2px solid #000;
 		border-left: 2px solid #000;
 		border-top: 2px solid #000;
@@ -37,6 +37,7 @@
 	}
 
 	.right-pane {
+		flex: 0 0 60%;
 		border-left: none;
 		border-right: 2px solid #000;
 		border-top: 2px solid #000;
