@@ -18,8 +18,9 @@
 	.container {
 		display: grid;
 		grid-template-columns: 4fr 6fr;
+		grid-template-rows: 100vh;
 		width: 100%;
-		height: 98vh;
+		max-height: 98vh;
 		box-sizing: border-box;
 	}
 
@@ -29,6 +30,7 @@
 	}
 
 	.left-pane {
+		max-height: 100%;
 		border-right: 2px solid #000;
 		border-left: 2px solid #000;
 		border-top: 2px solid #000;
@@ -46,7 +48,7 @@
 	}
 
 	.right-pane-content {
-		flex: 1;
+		/* flex: 1; */
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -59,5 +61,6 @@
 
 	.right-bottom {
 		flex: 0 0 40%;
+		overflow-y: auto;
 	}
 </style>
