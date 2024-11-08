@@ -16,7 +16,8 @@
 
 <style>
 	.container {
-		display: flex;
+		display: grid;
+		grid-template-columns: 4fr 6fr;
 		width: 100%;
 		height: 98vh;
 		box-sizing: border-box;
@@ -28,7 +29,6 @@
 	}
 
 	.left-pane {
-		flex: 0 0 40%;
 		border-right: 2px solid #000;
 		border-left: 2px solid #000;
 		border-top: 2px solid #000;
@@ -37,7 +37,6 @@
 	}
 
 	.right-pane {
-		flex: 0 0 60%;
 		border-left: none;
 		border-right: 2px solid #000;
 		border-top: 2px solid #000;
