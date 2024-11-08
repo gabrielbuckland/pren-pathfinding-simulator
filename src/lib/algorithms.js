@@ -3,6 +3,7 @@ import { fixedEdges } from './graphStructure.js';
 import { get } from 'svelte/store';
 import { addLog } from './logging.js';
 import { delay } from './utils.js';
+import { runAStar } from './algorithms/aStar.js';
 
 export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicleParams, animationMs) {
 	algorithmLogs.set([]);
@@ -24,7 +25,8 @@ export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicle
 }
 
 async function runAStarAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
-	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
+	//await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
+	await runAStar(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
 async function runDStarAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {

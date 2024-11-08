@@ -19,6 +19,30 @@
 		edgeStates.set(defaultEdgeStates);
 	}
 
+	function resetState() {
+		nodeStates.update((nodes) => {
+			const newNodes = {};
+			Object.keys(nodes).forEach((nodeId) => {
+				newNodes[nodeId] = {
+					...nodes[nodeId],
+					explState: 'default'
+				};
+			});
+			return newNodes;
+		});
+
+		edgeStates.update((edges) => {
+			const newEdges = {};
+			Object.keys(edges).forEach((edgeId) => {
+				newEdges[edgeId] = {
+					...edges[edgeId],
+					explState: 'default'
+				};
+			});
+			return newEdges;
+		});
+	}
+
 	function randomizeGraph() {
 		const randomNodes = {};
 		fixedNodes.forEach((node) => {
@@ -54,6 +78,7 @@
 			<div class="button-container">
 				<button class="randomize-btn" on:click={randomizeGraph}>Randomized graph</button>
 				<button on:click={resetGraph}>Reset graph</button>
+				<button on:click={resetState}>Reset state</button>
 			</div>
 		</div>
 		<Graph />
