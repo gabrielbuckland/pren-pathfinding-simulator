@@ -2,6 +2,7 @@
 	import { algorithmLogs, structuredLogs } from '../stores.js';
 	import { onDestroy } from 'svelte';
 	import { get } from 'svelte/store';
+	import { exportLogs } from '../logging.js';
 
 	let logs = [];
 	let structuredLogsData = [];
@@ -28,8 +29,29 @@
 	}
 
 	function exportStructuredLogs() {
-		console.log(get(structuredLogs));
-		console.log('Exporting structured logs (not implemented yet)');
+		const logs = get(structuredLogs);
+		const csvContent = exportLogs(logs, 'csv');
+
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const date = new Date();
+		const yyyymmdd = date.toISOString().slice(0, 10).replace(/-/g, '');
+		const filename = `pren_export_${yyyymmdd}.csv`;
+
+		const link = document.createElement('a');
+		if (link.download !== undefined) {
+			const url = URL.createObjectURL(blob);
+			link.setAttribute('href', url);
+			link.setAttribute('download', filename);
+			link.style.visibility = 'hidden';
+
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		} else if (navigator.msSaveBlob) {
+			navigator.msSaveBlob(blob, filename);
+		} else {
+			console.error('File download not supported by the browser.');
+		}
 	}
 </script>
 
