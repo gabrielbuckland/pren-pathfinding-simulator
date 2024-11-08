@@ -7,6 +7,7 @@
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import Logger from '../lib/components/Logger.svelte';
 	import { nodeStates, edgeStates } from '../lib/stores.js';
+	import { resetExplorationStates } from '../lib/utils';
 	import {
 		fixedNodes,
 		fixedEdges,
@@ -20,27 +21,7 @@
 	}
 
 	function resetState() {
-		nodeStates.update((nodes) => {
-			const newNodes = {};
-			Object.keys(nodes).forEach((nodeId) => {
-				newNodes[nodeId] = {
-					...nodes[nodeId],
-					explState: 'default'
-				};
-			});
-			return newNodes;
-		});
-
-		edgeStates.update((edges) => {
-			const newEdges = {};
-			Object.keys(edges).forEach((edgeId) => {
-				newEdges[edgeId] = {
-					...edges[edgeId],
-					explState: 'default'
-				};
-			});
-			return newEdges;
-		});
+		resetExplorationStates();
 	}
 
 	function randomizeGraph() {

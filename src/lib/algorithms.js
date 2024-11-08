@@ -4,14 +4,17 @@ import { get } from 'svelte/store';
 import { addLog } from './logging.js';
 import { delay } from './utils.js';
 import { runAStar } from './algorithms/aStar.js';
+import { runDStarLite } from './algorithms/dStarLite.js';
+import { runDijkstra } from './algorithms/dijkstra.js';
 
 export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicleParams, animationMs) {
 	algorithmLogs.set([]);
 
 	const algorithms = {
+		'Dijkstra': runDijkstraAlgorithm,
 		'A*': runAStarAlgorithm,
-		'D*': runDStarAlgorithm,
 		'D*Lite': runDStarLiteAlgorithm,
+		'Simulation': runSimulationAlgorithm,
 	};
 
 	const algorithm = algorithms[algorithmName];
@@ -24,16 +27,22 @@ export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicle
 	await algorithm(startNodeId, endpoint, vehicleParams, animationMs);
 }
 
+async function runDijkstraAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
+	//await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
+	await runDijkstra(startNodeId, goalNodeId, vehicleParams, animationMs);
+}
+
 async function runAStarAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	//await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
 	await runAStar(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
-async function runDStarAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
-	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
+async function runDStarLiteAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
+	//await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
+	await runDStarLite(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
-async function runDStarLiteAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
+async function runSimulationAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
