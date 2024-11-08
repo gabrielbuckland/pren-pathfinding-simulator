@@ -107,7 +107,7 @@
 	}
 
 	.section {
-		padding: 1rem;
+		padding-block: 1rem;
 	}
 
 	.section:last-child {
