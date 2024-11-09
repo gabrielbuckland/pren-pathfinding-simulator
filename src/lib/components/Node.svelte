@@ -6,6 +6,9 @@
 	export let y = 0;
 	export let isObstacle = false;
 	export let explState = 'default';
+	export let visibility = 'visible';
+
+	console.log(visibility);
 
 	function handleClick() {
 		isObstacle = !isObstacle;
@@ -23,7 +26,9 @@
 </script>
 
 <button
-	class="node {isObstacle ? 'obsticle' : ''} state-{explState}"
+	class="node {isObstacle ? 'obsticle' : ''} state-{explState} {visibility === 'hidden'
+		? 'hidden'
+		: ''}"
 	style="left: {x}px; top: {y}px"
 	on:click={handleClick}
 >
@@ -91,5 +96,9 @@
 		background-color: blue;
 		color: white;
 		outline: 2px solid blue;
+	}
+
+	.hidden {
+		opacity: 0;
 	}
 </style>

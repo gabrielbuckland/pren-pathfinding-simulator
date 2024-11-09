@@ -6,7 +6,7 @@ export function resetExplorationStates() {
 		for (const nodeId in states) {
 			newStates[nodeId] = {
 				...states[nodeId],
-				explState: 'default',
+				explState: 'default'
 			};
 		}
 		return newStates;
@@ -17,7 +17,7 @@ export function resetExplorationStates() {
 		for (const edgeId in states) {
 			newStates[edgeId] = {
 				...states[edgeId],
-				explState: 'default',
+				explState: 'default'
 			};
 		}
 		return newStates;

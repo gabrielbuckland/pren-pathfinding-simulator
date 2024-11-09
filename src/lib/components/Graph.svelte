@@ -8,10 +8,40 @@
 		acc[node.id] = node;
 		return acc;
 	}, {});
+
+	// Helper function to set visibility based on mode
+	function updateVisibility(mode) {
+		nodeStates.update((states) => {
+			fixedNodes.forEach((node) => {
+				const isVisible =
+					mode === 'interactive' || (mode === 'mentalMap' && ['S'].includes(node.id));
+				states[node.id] = {
+					...(states[node.id] || {}),
+					visibility: isVisible ? 'visible' : 'hidden'
+				};
+			});
+			return states;
+		});
+
+		edgeStates.update((states) => {
+			fixedEdges.forEach((edge) => {
+				const isVisible =
+					mode === 'interactive' || (mode === 'mentalMap' && [1, 2, 14].includes(edge.id));
+				states[edge.id] = {
+					...(states[edge.id] || {}),
+					visibility: isVisible ? 'visible' : 'hidden'
+				};
+			});
+			return states;
+		});
+	}
+
+	// Reactive block to update visibility when executionMode changes
+	$: updateVisibility($executionMode);
 </script>
 
 <section class="graph">
-	{#if $executionMode === 'interactive'}
+	{#if $executionMode === 'interactive' || $executionMode === 'mentalMap'}
 		{#each fixedNodes as node (node.id)}
 			<Node
 				id={node.id}
@@ -19,6 +49,7 @@
 				y={node.y}
 				isObstacle={$nodeStates[node.id]?.isObstacle || false}
 				explState={$nodeStates[node.id]?.explState || 'default'}
+				visibility={$nodeStates[node.id]?.visibility || 'visible'}
 			/>
 		{/each}
 
@@ -29,6 +60,7 @@
 				to={{ x2: nodesById[edge.to].x, y2: nodesById[edge.to].y }}
 				type={$edgeStates[edge.id]?.type || 'solid'}
 				explState={$edgeStates[edge.id]?.explState || 'default'}
+				visibility={$edgeStates[edge.id]?.visibility || 'visible'}
 			/>
 		{/each}
 	{:else if $executionMode === 'parameterized'}

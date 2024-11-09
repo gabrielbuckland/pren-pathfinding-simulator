@@ -7,14 +7,20 @@ import { runAStar } from './algorithms/aStar.js';
 import { runDStarLite } from './algorithms/dStarLite.js';
 import { runDijkstra } from './algorithms/dijkstra.js';
 
-export async function runAlgorithm(algorithmName, startNodeId, endpoint, vehicleParams, animationMs) {
+export async function runAlgorithm(
+	algorithmName,
+	startNodeId,
+	endpoint,
+	vehicleParams,
+	animationMs
+) {
 	algorithmLogs.set([]);
 
 	const algorithms = {
-		'Dijkstra': runDijkstraAlgorithm,
+		Dijkstra: runDijkstraAlgorithm,
 		'A*': runAStarAlgorithm,
 		'D*Lite': runDStarLiteAlgorithm,
-		'Simulation': runSimulationAlgorithm,
+		Simulation: runSimulationAlgorithm
 	};
 
 	const algorithm = algorithms[algorithmName];
@@ -56,8 +62,8 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 		...states,
 		[startNodeId]: {
 			...(states[startNodeId] || {}),
-			explState: 'probed',
-		},
+			explState: 'probed'
+		}
 	}));
 
 	while (queue.length > 0) {
@@ -73,8 +79,8 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 				...states,
 				[edgeId]: {
 					...(states[edgeId] || {}),
-					explState: 'visited',
-				},
+					explState: 'visited'
+				}
 			}));
 		}
 
@@ -84,8 +90,8 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 			...states,
 			[currentNodeId]: {
 				...(states[currentNodeId] || {}),
-				explState: 'visited',
-			},
+				explState: 'visited'
+			}
 		}));
 		visitedNodes.add(currentNodeId);
 
@@ -99,8 +105,8 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 				...states,
 				[currentNodeId]: {
 					...(states[currentNodeId] || {}),
-					explState: 'finished',
-				},
+					explState: 'finished'
+				}
 			}));
 
 			await highlightPath(cameFrom, currentNodeId, vehicleParams);
@@ -124,8 +130,8 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 					...states,
 					[neighborId]: {
 						...(states[neighborId] || {}),
-						explState: 'probed',
-					},
+						explState: 'probed'
+					}
 				}));
 
 				// Mark edge as 'probed'
@@ -134,8 +140,8 @@ async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animati
 					...states,
 					[edgeId]: {
 						...(states[edgeId] || {}),
-						explState: 'probed',
-					},
+						explState: 'probed'
+					}
 				}));
 
 				queue.push(neighborId);
@@ -183,8 +189,8 @@ function markEdgeRestriced(edgeId) {
 		...states,
 		[edgeId]: {
 			...(states[edgeId] || {}),
-			explState: 'restricted',
-		},
+			explState: 'restricted'
+		}
 	}));
 }
 
@@ -193,24 +199,22 @@ function markNodeRestricted(nodeId) {
 		...states,
 		[nodeId]: {
 			...(states[nodeId] || {}),
-			explState: 'restricted',
-		},
+			explState: 'restricted'
+		}
 	}));
 }
 
 function markNodeAndEdgesRestricted(nodeId) {
 	markNodeRestricted(nodeId);
 
-	const connectedEdges = fixedEdges.filter(
-		(edge) => edge.from === nodeId || edge.to === nodeId
-	);
+	const connectedEdges = fixedEdges.filter((edge) => edge.from === nodeId || edge.to === nodeId);
 
 	edgeStates.update((states) => {
 		const newStates = { ...states };
 		for (const edge of connectedEdges) {
 			newStates[edge.id] = {
 				...(newStates[edge.id] || {}),
-				explState: 'restricted',
+				explState: 'restricted'
 			};
 		}
 		return newStates;
@@ -219,10 +223,7 @@ function markNodeAndEdgesRestricted(nodeId) {
 
 function getEdgeId(fromId, toId) {
 	for (const edge of fixedEdges) {
-		if (
-			(edge.from === fromId && edge.to === toId) ||
-			(edge.from === toId && edge.to === fromId)
-		) {
+		if ((edge.from === fromId && edge.to === toId) || (edge.from === toId && edge.to === fromId)) {
 			return edge.id;
 		}
 	}
@@ -235,7 +236,7 @@ async function highlightPath(cameFrom, currentNodeId, vehicleParams) {
 		currentNodeId = cameFrom[currentNodeId];
 		path.unshift(currentNodeId);
 
-/*
+		/*
 		nodeStates.update((states) => ({
 			...states,
 			[currentNodeId]: {
@@ -263,9 +264,7 @@ async function highlightPath(cameFrom, currentNodeId, vehicleParams) {
 		const edgeId = getEdgeId(fromNodeId, toNodeId);
 		const edgeState = get(edgeStates)[edgeId];
 		const traversalTime =
-			edgeState.type === 'barrier'
-				? vehicleParams.timeWithBarrier
-				: vehicleParams.timeToTraverse;
+			edgeState.type === 'barrier' ? vehicleParams.timeWithBarrier : vehicleParams.timeToTraverse;
 		totalTime += traversalTime;
 	}
 

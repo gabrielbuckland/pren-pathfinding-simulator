@@ -103,6 +103,12 @@
 		>
 			Parameterized run
 		</button>
+		<button
+			class:selected={selectedOption === 'mentalMap'}
+			on:click={() => selectOption('mentalMap')}
+		>
+			Create mental map
+		</button>
 	</div>
 
 	<button class="bold" on:click={runSimulation}>Run simulation</button>

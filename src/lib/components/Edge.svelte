@@ -7,6 +7,7 @@
 	export let to = { x2: 0, y2: 0 };
 	export let type;
 	export let explState;
+	export let visibility = 'visible';
 
 	// Define the types
 	const types = ['solid', 'dashed', 'barrier'];
@@ -61,7 +62,12 @@
 	}
 </script>
 
-<svg {width} {height} style="position: absolute; left: {left}px; top: {top}px;">
+<svg
+	class={visibility === 'hidden' ? 'hidden' : ''}
+	{width}
+	{height}
+	style="position: absolute; left: {left}px; top: {top}px;"
+>
 	<!-- Draw the line directly between the nodes -->
 	<line class="{currentType} state-{currentExplState}" {x1} {y1} {x2} {y2} on:click={handleClick} />
 	{#if currentType === 'barrier'}
@@ -80,6 +86,10 @@
 	svg {
 		overflow: visible;
 		pointer-events: none;
+	}
+
+	svg.hidden {
+		opacity: 0;
 	}
 
 	line {
