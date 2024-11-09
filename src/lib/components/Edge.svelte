@@ -88,8 +88,15 @@
 		pointer-events: none;
 	}
 
-	svg.hidden {
+	.hidden {
 		opacity: 0;
+		pointer-events: none;
+		overflow: clip;
+	}
+
+	.hidden * {
+		opacity: 0;
+		pointer-events: none;
 	}
 
 	line {

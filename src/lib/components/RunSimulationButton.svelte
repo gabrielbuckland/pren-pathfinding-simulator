@@ -1,0 +1,54 @@
+<script>
+	import {
+		selectedEndpoint,
+		vehicleParameters,
+		selectedAlgorithm,
+		animationSpeed,
+		executionMode
+	} from '../stores.js';
+	import { runAlgorithm, simulateMentalMapCreation } from '../algorithms.js';
+	import { get } from 'svelte/store';
+	import { resetExplorationStates } from '../utils.js';
+
+	async function runSimulation() {
+		if ($executionMode === 'interactive') {
+			try {
+				resetExplorationStates();
+
+				const algorithmName = get(selectedAlgorithm);
+				const startpoint = 'S';
+				const endpoint = get(selectedEndpoint);
+				const vehicleParams = get(vehicleParameters);
+				const animationMs = get(animationSpeed);
+
+				await runAlgorithm(algorithmName, startpoint, endpoint, vehicleParams, animationMs);
+			} catch (error) {
+				console.error('Error running simulation:', error);
+			}
+		} else if ($executionMode === 'parameterized') {
+			console.log('Parameterized run is not yet implemented.');
+		} else if ($executionMode === 'mentalMap') {
+			resetExplorationStates();
+			await simulateMentalMapCreation();
+		} else {
+			console.error('option not selected correctly');
+		}
+	}
+</script>
+
+<button class="bold" on:click={runSimulation}>Run simulation</button>
+
+<style>
+	button {
+		padding: 0.75rem;
+		background-color: #007bff;
+		color: #fff;
+		border: none;
+		cursor: pointer;
+		width: 100%;
+	}
+
+	button:hover {
+		background-color: #0056b3;
+	}
+</style>

@@ -1,11 +1,19 @@
 import { nodeStates, edgeStates, algorithmLogs } from './stores.js';
-import { fixedEdges } from './graphStructure.js';
+import { fixedEdges, fixedNodes } from './graphStructure.js';
 import { get } from 'svelte/store';
 import { addLog } from './logging.js';
 import { delay } from './utils.js';
 import { runAStar } from './algorithms/aStar.js';
 import { runDStarLite } from './algorithms/dStarLite.js';
 import { runDijkstra } from './algorithms/dijkstra.js';
+import { GraphExplorer } from './GraphExplorer.js';
+
+export async function simulateMentalMapCreation() {
+	algorithmLogs.set([]);
+
+	addLog(`Starting to create mental map...`, 'info');
+	await createMentalMap();
+}
 
 export async function runAlgorithm(
 	algorithmName,
@@ -50,6 +58,12 @@ async function runDStarLiteAlgorithm(startNodeId, goalNodeId, vehicleParams, ani
 
 async function runSimulationAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
+}
+
+async function createMentalMap() {
+	const graphExplorer = new GraphExplorer();
+	await graphExplorer.explore();
+	addLog(`Mental map complete!`, 'success');
 }
 
 async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {

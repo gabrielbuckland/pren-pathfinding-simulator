@@ -8,8 +8,6 @@
 	export let explState = 'default';
 	export let visibility = 'visible';
 
-	console.log(visibility);
-
 	function handleClick() {
 		isObstacle = !isObstacle;
 
@@ -100,5 +98,6 @@
 
 	.hidden {
 		opacity: 0;
+		pointer-events: none;
 	}
 </style>

@@ -1,48 +1,13 @@
 <script>
-	import {
-		nodeStates,
-		edgeStates,
-		selectedEndpoint,
-		vehicleParameters,
-		selectedAlgorithm,
-		animationSpeed,
-		executionMode
-	} from '../stores.js';
-	import { runAlgorithm } from '../algorithms.js';
+	import { selectedEndpoint, animationSpeed, executionMode } from '../stores.js';
 	import { get } from 'svelte/store';
-	import { resetExplorationStates } from '../utils.js';
 
 	let numGraphs = 1;
 	let exportEnabled = false;
 	let selectedOption = get(executionMode);
 
-	async function runSimulation() {
-		if (selectedOption === 'interactive') {
-			try {
-				resetExplorationStates();
-
-				const algorithmName = get(selectedAlgorithm);
-				const startpoint = 'S';
-				const endpoint = get(selectedEndpoint);
-				const vehicleParams = get(vehicleParameters);
-				const animationMs = get(animationSpeed);
-
-				await runAlgorithm(algorithmName, startpoint, endpoint, vehicleParams, animationMs);
-			} catch (error) {
-				console.error('Error running simulation:', error);
-			}
-		} else if (selectedOption === 'parameterized') {
-			console.log('Parameterized run is not yet implemented.');
-		}
-	}
-
 	function exportResults(results) {
 		console.log('Exporting results:', results);
-	}
-
-	function selectOption(option) {
-		selectedOption = option;
-		executionMode.set(option);
 	}
 </script>
 
@@ -89,60 +54,12 @@
 			bind:value={$animationSpeed}
 		/>
 	</label>
-
-	<div class="segmented-button">
-		<button
-			class:selected={selectedOption === 'interactive'}
-			on:click={() => selectOption('interactive')}
-		>
-			Interactive run
-		</button>
-		<button
-			class:selected={selectedOption === 'parameterized'}
-			on:click={() => selectOption('parameterized')}
-		>
-			Parameterized run
-		</button>
-		<button
-			class:selected={selectedOption === 'mentalMap'}
-			on:click={() => selectOption('mentalMap')}
-		>
-			Create mental map
-		</button>
-	</div>
-
-	<button class="bold" on:click={runSimulation}>Run simulation</button>
 </div>
 
 <style>
 	.simulator-options {
 		display: flex;
 		flex-direction: column;
-	}
-
-	.segmented-button {
-		display: flex;
-		width: 100%;
-		margin-bottom: 1rem;
-	}
-
-	.segmented-button button {
-		flex: 1;
-		padding: 0.75rem;
-		background-color: #f1f1f1;
-		color: #000;
-		border: 1px solid #ccc;
-		cursor: pointer;
-	}
-
-	.segmented-button button:hover {
-		background-color: #e0e0e0;
-	}
-
-	.segmented-button button.selected {
-		background-color: #007bff;
-		color: #fff;
-		border-color: #0056b3;
 	}
 
 	.bold {
@@ -185,18 +102,5 @@
 
 	input[type='checkbox'] {
 		margin-right: 0.5rem;
-	}
-
-	button {
-		padding: 0.75rem;
-		background-color: #007bff;
-		color: #fff;
-		border: none;
-		cursor: pointer;
-		width: 100%;
-	}
-
-	button:hover {
-		background-color: #0056b3;
 	}
 </style>

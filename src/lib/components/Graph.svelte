@@ -3,6 +3,7 @@
 	import Node from './Node.svelte';
 	import { fixedNodes, fixedEdges } from '../graphStructure.js';
 	import { nodeStates, edgeStates, executionMode } from '../stores.js';
+	import { get } from 'svelte/store';
 
 	const nodesById = fixedNodes.reduce((acc, node) => {
 		acc[node.id] = node;
@@ -25,8 +26,11 @@
 
 		edgeStates.update((states) => {
 			fixedEdges.forEach((edge) => {
-				const isVisible =
+				let isVisible =
 					mode === 'interactive' || (mode === 'mentalMap' && [1, 2, 14].includes(edge.id));
+				if (get(edgeStates)[edge.id]?.type === 'dashed' && mode === 'mentalMap') {
+					isVisible = false;
+				}
 				states[edge.id] = {
 					...(states[edge.id] || {}),
 					visibility: isVisible ? 'visible' : 'hidden'

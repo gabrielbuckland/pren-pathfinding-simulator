@@ -60,19 +60,19 @@ export const fixedEdges = [
 ];
 
 export const defaultEdgeStates = {
-	1: { type: 'solid', explState: 'default', visibility: 'visible' },
-	2: { type: 'solid', explState: 'default', visibility: 'visible' },
-	3: { type: 'solid', explState: 'default', visibility: 'visible' },
-	4: { type: 'solid', explState: 'default', visibility: 'visible' },
-	5: { type: 'solid', explState: 'default', visibility: 'visible' },
-	6: { type: 'solid', explState: 'default', visibility: 'visible' },
-	7: { type: 'solid', explState: 'default', visibility: 'visible' },
-	8: { type: 'solid', explState: 'default', visibility: 'visible' },
-	9: { type: 'solid', explState: 'default', visibility: 'visible' },
-	10: { type: 'solid', explState: 'default', visibility: 'visible' },
-	11: { type: 'solid', explState: 'default', visibility: 'visible' },
-	12: { type: 'solid', explState: 'default', visibility: 'visible' },
-	13: { type: 'solid', explState: 'default', visibility: 'visible' },
-	14: { type: 'solid', explState: 'default', visibility: 'visible' },
-	15: { type: 'solid', explState: 'default', visibility: 'visible' }
+	1: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	2: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	3: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	4: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	5: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	6: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	7: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	8: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	9: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	10: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	11: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	12: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	13: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	14: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true },
+	15: { type: 'solid', explState: 'default', visibility: 'visible', traversable: true }
 };

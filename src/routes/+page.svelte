@@ -6,7 +6,7 @@
 	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import Logger from '../lib/components/Logger.svelte';
-	import { nodeStates, edgeStates } from '../lib/stores.js';
+	import { nodeStates, edgeStates, executionMode } from '../lib/stores.js';
 	import { resetExplorationStates } from '../lib/utils';
 	import {
 		fixedNodes,
@@ -14,6 +14,8 @@
 		defaultNodeStates,
 		defaultEdgeStates
 	} from '../lib/graphStructure.js';
+	import ExecutionOption from '../lib/components/ExecutionOption.svelte';
+	import RunSimulationButton from '../lib/components/RunSimulationButton.svelte';
 
 	function resetGraph() {
 		nodeStates.set(defaultNodeStates);
@@ -67,21 +69,27 @@
 
 	<div slot="right-top" class="right-top-pane">
 		<Title>Dashboard</Title>
-
 		<div class="section">
-			<Title>Vehicle-Parameters:</Title>
-			<VehicleParameters />
+			<Title>Execution mode:</Title>
+			<ExecutionOption />
 		</div>
+		{#if $executionMode !== 'mentalMap'}
+			<div class="section">
+				<Title>Vehicle-Parameters:</Title>
+				<VehicleParameters />
+			</div>
 
-		<div class="section">
-			<Title>Algorithm-Selection:</Title>
-			<AlgorithmSelection />
-		</div>
+			<div class="section">
+				<Title>Algorithm-Selection:</Title>
+				<AlgorithmSelection />
+			</div>
+			<div class="section">
+				<Title>Simulator-Options:</Title>
+				<SimulatorOptions />
+			</div>
+		{/if}
 
-		<div class="section">
-			<Title>Simulator-Options:</Title>
-			<SimulatorOptions />
-		</div>
+		<RunSimulationButton />
 	</div>
 
 	<div slot="right-bottom" class="right-bottom-pane">
