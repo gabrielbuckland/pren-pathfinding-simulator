@@ -22,11 +22,8 @@
 	>
 		Parameterized run
 	</button>
-	<button
-		class:selected={selectedOption === 'mentalMap'}
-		on:click={() => selectOption('mentalMap')}
-	>
-		Create mental map
+	<button class:selected={selectedOption === 'explore'} on:click={() => selectOption('explore')}>
+		Explore map
 	</button>
 </div>
 

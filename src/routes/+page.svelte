@@ -73,7 +73,7 @@
 			<Title>Execution mode:</Title>
 			<ExecutionOption />
 		</div>
-		{#if $executionMode !== 'mentalMap'}
+		{#if $executionMode !== 'explore'}
 			<div class="section">
 				<Title>Vehicle-Parameters:</Title>
 				<VehicleParameters />

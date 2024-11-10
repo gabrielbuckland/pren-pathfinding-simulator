@@ -8,11 +8,11 @@ import { runDStarLite } from './algorithms/dStarLite.js';
 import { runDijkstra } from './algorithms/dijkstra.js';
 import { GraphExplorer } from './GraphExplorer.js';
 
-export async function simulateMentalMapCreation() {
+export async function simulateMapExploration() {
 	algorithmLogs.set([]);
 
-	addLog(`Starting to create mental map...`, 'info');
-	await createMentalMap();
+	addLog(`Starting to explore map...`, 'info');
+	await exploreMap();
 }
 
 export async function runAlgorithm(
@@ -60,10 +60,10 @@ async function runSimulationAlgorithm(startNodeId, goalNodeId, vehicleParams, an
 	await simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs);
 }
 
-async function createMentalMap() {
+async function exploreMap() {
 	const graphExplorer = new GraphExplorer();
 	await graphExplorer.explore();
-	addLog(`Mental map complete!`, 'success');
+	addLog(`Map exploration complete!`, 'success');
 }
 
 async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {

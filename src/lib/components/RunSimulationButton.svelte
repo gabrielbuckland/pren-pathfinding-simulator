@@ -6,7 +6,7 @@
 		animationSpeed,
 		executionMode
 	} from '../stores.js';
-	import { runAlgorithm, simulateMentalMapCreation } from '../algorithms.js';
+	import { runAlgorithm, simulateMapExploration } from '../algorithms.js';
 	import { get } from 'svelte/store';
 	import { resetExplorationStates } from '../utils.js';
 
@@ -27,9 +27,9 @@
 			}
 		} else if ($executionMode === 'parameterized') {
 			console.log('Parameterized run is not yet implemented.');
-		} else if ($executionMode === 'mentalMap') {
+		} else if ($executionMode === 'explore') {
 			resetExplorationStates();
-			await simulateMentalMapCreation();
+			await simulateMapExploration();
 		} else {
 			console.error('option not selected correctly');
 		}
