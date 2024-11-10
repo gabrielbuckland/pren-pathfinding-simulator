@@ -10,8 +10,6 @@ import { GraphExplorer } from './GraphExplorer.js';
 
 export async function simulateMapExploration() {
 	algorithmLogs.set([]);
-
-	addLog(`Starting to explore map...`, 'info');
 	await exploreMap();
 }
 
@@ -63,7 +61,6 @@ async function runSimulationAlgorithm(startNodeId, goalNodeId, vehicleParams, an
 async function exploreMap() {
 	const graphExplorer = new GraphExplorer();
 	await graphExplorer.explore();
-	addLog(`Map exploration complete!`, 'success');
 }
 
 async function simulateAlgorithm(startNodeId, goalNodeId, vehicleParams, animationMs) {

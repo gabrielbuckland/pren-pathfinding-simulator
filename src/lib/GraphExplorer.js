@@ -21,6 +21,7 @@ export class GraphExplorer {
 	}
 
 	async explore() {
+		addLog('Starting map exploration...', 'info');
 		this.nodeStack.push({ nodeId: this.startNodeId, edgeId: null }); // Initialize with start node and no leading edge
 
 		while (this.nodeStack.length > 0) {
@@ -35,12 +36,18 @@ export class GraphExplorer {
 			if (leadingEdgeId !== null) {
 				await delay(200); // Optional: Add a small delay to allow visual emphasis on the edge before the node
 				this._markEdgeAsTraversed(leadingEdgeId);
-				addLog(`Edge '${leadingEdgeId}' marked as traversed`, 'info');
+
+				const leadingEdge = this.graph.edges.find((edge) => edge.id === leadingEdgeId);
+				const from = leadingEdge.from === currentNodeId ? leadingEdge.to : leadingEdge.from;
+				const to = leadingEdge.from === currentNodeId ? leadingEdge.from : leadingEdge.to;
+
+				addLog(`Edge from '${from}' to '${to}' marked as traversed`, 'info');
 			}
 
 			// Now visit the current node
 			await this._exploreNode(currentNodeId);
 		}
+		addLog('Map exploration complete!', 'success');
 	}
 
 	async _exploreNode(nodeId) {
@@ -63,10 +70,7 @@ export class GraphExplorer {
 
 				// Only proceed if the next node is unvisited and unrestricted
 				if (!this.visitedNodes.has(nextNodeId) && !this._isNodeRestricted(nextNodeId)) {
-					addLog(
-						`Adding node '${nextNodeId}' to stack with edge '${edge.id}' for further exploration`,
-						'info'
-					);
+					addLog(`Adding node '${nextNodeId}' to stack`, 'info');
 					// Push the node and the edge that leads to it onto the stack
 					this.nodeStack.push({ nodeId: nextNodeId, edgeId: edge.id });
 				}
@@ -83,9 +87,16 @@ export class GraphExplorer {
 				get(edgeStates)[e.id]?.type !== 'restricted'
 		);
 		addLog(
-			`Possible edges from node '${nodeId}': ${JSON.stringify(possibleEdges.map((e) => e.id))}`,
+			`Possible edges from node '${nodeId}': ${JSON.stringify(
+				possibleEdges.map((e) => {
+					const from = e.from === nodeId ? e.from : e.to;
+					const to = e.from === nodeId ? e.to : e.from;
+					return { from, to };
+				})
+			)}`,
 			'info'
 		);
+
 		return possibleEdges;
 	}
 
@@ -105,8 +116,13 @@ export class GraphExplorer {
 		if (this._hasCone(targetNodeId)) {
 			this._setEdgeIntraversable(edgeId);
 			this._updateNodeState(targetNodeId, { explState: 'restricted', visibility: 'visible' });
+
+			const edge = this.graph.edges.find((e) => e.id === edgeId);
+			const from = edge.from === currentNode ? edge.from : edge.to;
+			const to = edge.from === currentNode ? edge.to : edge.from;
+
 			addLog(
-				`Edge '${edgeId}' marked as intraversable due to cone at target node '${targetNodeId}'`,
+				`Edge from '${from}' to '${to}' marked as intraversable due to cone at target node '${targetNodeId}'`,
 				'warn'
 			);
 			return; // Skip this edge if it's not traversable
@@ -286,34 +302,6 @@ export class GraphExplorer {
 
 			const intersectionPoint = this._calculateIntersection(p1, q1, p2, q2);
 			if (!intersectionPoint) continue;
-
-			// If the visited edge is restricted, mark the current edge as restricted
-			if (get(edgeStates)[visitedEdgeId]?.explState === 'restricted') {
-				this._setEdgeIntraversable(edge.id);
-				addLog(
-					`Edge '${edge.id}' marked as restricted due to intersection with restricted edge '${visitedEdgeId}'`,
-					'info'
-				);
-				return; // Exit early since this edge is now restricted
-			}
-
-			// Handle node intersections if an intersection point is detected
-			const nodeAtIntersection = this._isNodeNearIntersection(intersectionPoint, 10);
-			if (!nodeAtIntersection || this.visitedNodes.has(nodeAtIntersection.id)) continue;
-
-			// Mark node and its connected edges as restricted if there's a cone
-			if (this._hasCone(nodeAtIntersection.id)) {
-				this._handleConeDetection(nodeAtIntersection);
-			} else {
-				addLog(
-					`Node '${nodeAtIntersection.id}' detected due to intersection of edges (${edge.from}, ${edge.to}) & (${visitedEdge.from}, ${visitedEdge.to}`,
-					'info'
-				);
-				this._updateNodeState(nodeAtIntersection.id, {
-					explState: 'probed',
-					visibility: 'visible'
-				});
-			}
 		}
 	}
 }
