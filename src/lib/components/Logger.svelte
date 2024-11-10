@@ -60,7 +60,8 @@
 		<h1>Logs</h1>
 		<div class="controls">
 			<span>{structuredLogsData.length} logs collected</span>
-			<button class="clear-structured-logs-button" on:click={clearStructuredLogs}>Clear logs</button>
+			<button class="clear-structured-logs-button" on:click={clearStructuredLogs}>Clear logs</button
+			>
 			<button class="export-button" on:click={exportStructuredLogs}>Export logs</button>
 			<button class="clear-button" on:click={clearLogs}>Clear screen</button>
 		</div>
@@ -135,19 +136,24 @@
 		align-items: center;
 	}
 
+	.log-message::before {
+		margin-right: 0.5rem;
+	}
+
 	.log-message.info::before {
 		content: 'ℹ️';
-		margin-right: 0.5rem;
 	}
 
 	.log-message.success::before {
 		content: '✅';
-		margin-right: 0.5rem;
 	}
 
 	.log-message.error::before {
 		content: '❌';
-		margin-right: 0.5rem;
+	}
+
+	.log-message.warn::before {
+		content: '🚨';
 	}
 
 	.timestamp {

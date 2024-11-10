@@ -3,7 +3,7 @@ import { algorithmLogs, structuredLogs } from './stores.js';
 /**
  * Adds a log message to the algorithmLogs store and creates a structured log.
  * @param {string} message - The log message.
- * @param {string} type - The type of log ('info', 'success', 'error').
+ * @param {string} type - The type of log ('info', 'success', 'error', 'warn').
  * @param {object} context - Additional context for structured logging.
  */
 export function addLog(message, type = 'info', context = {}) {
@@ -14,15 +14,15 @@ export function addLog(message, type = 'info', context = {}) {
 		{
 			timestamp: timestamp.toLocaleTimeString(),
 			message,
-			type,
-		},
+			type
+		}
 	]);
 
 	addStructuredLog({
 		timestamp: timestamp.toISOString(),
 		message,
 		type,
-		...context,
+		...context
 	});
 }
 
@@ -62,7 +62,7 @@ function exportLogsToCSV(logs) {
 	const headers = Object.keys(logs[0]);
 	const csvRows = [
 		headers.join(','),
-		...logs.map(log => headers.map(header => JSON.stringify(log[header] ?? '')).join(','))
+		...logs.map((log) => headers.map((header) => JSON.stringify(log[header] ?? '')).join(','))
 	];
 	return csvRows.join('\n');
 }
