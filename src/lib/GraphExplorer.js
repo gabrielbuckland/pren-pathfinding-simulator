@@ -17,114 +17,118 @@ export class GraphExplorer {
 			nodes: fixedNodes,
 			edges: fixedEdges
 		};
+		this.nodeStack = [];
 	}
 
 	async explore() {
-		await this._exploreNode(this.startNodeId);
+		this.nodeStack.push({ nodeId: this.startNodeId, edgeId: null }); // Initialize with start node and no leading edge
+
+		while (this.nodeStack.length > 0) {
+			const { nodeId: currentNodeId, edgeId: leadingEdgeId } = this.nodeStack.pop();
+
+			// Skip nodes that are restricted or already visited
+			if (this._isNodeRestricted(currentNodeId) || this.visitedNodes.has(currentNodeId)) {
+				continue;
+			}
+
+			// Mark the leading edge as traversed, if it exists, before visiting the node
+			if (leadingEdgeId !== null) {
+				await delay(200); // Optional: Add a small delay to allow visual emphasis on the edge before the node
+				this._markEdgeAsTraversed(leadingEdgeId);
+				addLog(`Edge '${leadingEdgeId}' marked as traversed`, 'info');
+			}
+
+			// Now visit the current node
+			await this._exploreNode(currentNodeId);
+		}
 	}
 
 	async _exploreNode(nodeId) {
-		const edges = this._getEdgesFromNode(nodeId).filter(
-			(e) =>
-				!this.visitedEdges.has(e.id) &&
-				!this.intraversibleEdges.has(e.id) &&
-				get(edgeStates)[e.id]?.type !== 'dashed'
-		);
+		this._visitNode(nodeId);
 
-		if (!edges || edges.length === 0) return;
+		let edges = this._getPossibleEdges(nodeId);
+
+		if (!edges || edges.length === 0) {
+			addLog(`No possible edges from node '${nodeId}', backtracking...`, 'info');
+			return; // Backtrack if there are no possible edges
+		}
 
 		await delay(200);
 
-		addLog(`Moving to node '${nodeId}'`, 'info');
-		this._visitNode(nodeId);
-
 		for (const edge of edges) {
-			await delay(200);
-			addLog(`Exploring edge from '${edge.from}' to '${edge.to}'`);
-			const targetNodeId = edge.to === nodeId ? edge.from : edge.to; // Ensure target node is the opposite node
-			const edgeId = edge.id;
+			if (!this.visitedEdges.has(edge.id)) {
+				await this._exploreEdge(edge, nodeId);
 
-			// Skip if the edge has already been visited
-			if (this.visitedEdges.has(edgeId)) continue;
+				const nextNodeId = edge.to === nodeId ? edge.from : edge.to;
 
-			this.visitedEdges.add(edgeId);
-			this._updateEdgeState(edge.id, { explState: 'probed', visibility: 'visible' });
-
-			// Check if there's a cone (obstacle) at the target node
-			if (this._hasCone(targetNodeId)) {
-				this._setEdgeIntraversable(edgeId);
-				this._updateNodeState(targetNodeId, { explState: 'restricted', visibility: 'visible' });
-				continue; // Skip this edge if it's not traversable
+				// Only proceed if the next node is unvisited and unrestricted
+				if (!this.visitedNodes.has(nextNodeId) && !this._isNodeRestricted(nextNodeId)) {
+					addLog(
+						`Adding node '${nextNodeId}' to stack with edge '${edge.id}' for further exploration`,
+						'info'
+					);
+					// Push the node and the edge that leads to it onto the stack
+					this.nodeStack.push({ nodeId: nextNodeId, edgeId: edge.id });
+				}
 			}
-
-			this._checkIntersections(edge);
 		}
-
-		// Pick a random unvisited edge to explore next
-		const nextEdge = this._getRandomElementFromList(edges);
-		if (!nextEdge) return; // If no unvisited edges remain, stop exploring
-
-		const nextNodeId = nextEdge.to === nodeId ? nextEdge.from : nextEdge.to; // Move to the opposite node
-		this.visitedNodes.add(nextNodeId);
-		this._updateNodeState(nextNodeId, { explState: 'probed', visibility: 'visible' });
-		await this._exploreNode(nextNodeId);
 	}
 
-	_checkIntersections(edge) {
-		const { nodes, edges } = this.graph;
-		const [p1, q1] = [edge.from, edge.to].map((id) => nodes.find((node) => node.id === id));
+	_getPossibleEdges(nodeId) {
+		const possibleEdges = this._getEdgesFromNode(nodeId).filter(
+			(e) =>
+				!this.visitedEdges.has(e.id) &&
+				!this.intraversibleEdges.has(e.id) &&
+				get(edgeStates)[e.id]?.type !== 'dashed' &&
+				get(edgeStates)[e.id]?.type !== 'restricted'
+		);
+		addLog(
+			`Possible edges from node '${nodeId}': ${JSON.stringify(possibleEdges.map((e) => e.id))}`,
+			'info'
+		);
+		return possibleEdges;
+	}
 
-		for (const visitedEdgeId of this.visitedEdges) {
-			const visitedEdge = edges.find((e) => e.id === visitedEdgeId);
-			if (!visitedEdge) continue;
+	async _exploreEdge(edge, currentNode) {
+		await delay(200);
+		addLog(`Exploring edge from '${edge.from}' to '${edge.to}'`);
+		const targetNodeId = edge.to === currentNode ? edge.from : edge.to; // Ensure target node is the opposite node
+		const edgeId = edge.id;
 
-			const [p2, q2] = [visitedEdge.from, visitedEdge.to].map((id) =>
-				nodes.find((node) => node.id === id)
+		// Skip if the edge has already been visited
+		if (this.visitedEdges.has(edgeId)) return;
+
+		this.visitedEdges.add(edgeId);
+		this._updateEdgeState(edge.id, { explState: 'probed', visibility: 'visible' });
+
+		// Check if there's a cone (obstacle) at the target node
+		if (this._hasCone(targetNodeId)) {
+			this._setEdgeIntraversable(edgeId);
+			this._updateNodeState(targetNodeId, { explState: 'restricted', visibility: 'visible' });
+			addLog(
+				`Edge '${edgeId}' marked as intraversable due to cone at target node '${targetNodeId}'`,
+				'warn'
 			);
-
-			// Check if the current edge intersects with the visited edge
-			if (!this._doIntersect(p1, q1, p2, q2)) continue;
-
-			const intersectionPoint = this._calculateIntersection(p1, q1, p2, q2);
-			if (!intersectionPoint) continue;
-
-			// If the visited edge is restricted, mark the current edge as restricted
-			// if (get(edgeStates)[visitedEdgeId]?.explState === 'restricted') {
-			// 	this._setEdgeIntraversable(edge.id);
-			// 	addLog(
-			// 		`Edge '${edge.id}' marked as restricted due to intersection with restricted edge '${visitedEdgeId}'`,
-			// 		'info'
-			// 	);
-			// 	return; // Exit early since this edge is now restricted
-			// }
-
-			// Handle node intersections if an intersection point is detected
-			const nodeAtIntersection = this._isNodeNearIntersection(intersectionPoint, 10);
-			if (!nodeAtIntersection || this.visitedNodes.has(nodeAtIntersection.id)) continue;
-
-			// Mark node and its connected edges as restricted if there's a cone
-			if (this._hasCone(nodeAtIntersection.id)) {
-				this._updateNodeState(nodeAtIntersection.id, {
-					explState: 'restricted',
-					visibility: 'visible'
-				});
-				this.visitedEdges
-					.filter((e) => e.from === nodeAtIntersection.id || e.to === nodeAtIntersection.id)
-					.forEach((e) => {
-						this._setEdgeIntraversable(e.id);
-					});
-			} else {
-				addLog(
-					`Node '${nodeAtIntersection.id}' detected due to intersection of edges (${edge.from}, ${edge.to}) & (${visitedEdge.from}, ${visitedEdge.to})`,
-					'info'
-				);
-				this._updateNodeState(nodeAtIntersection.id, {
-					explState: 'default',
-					visibility: 'visible'
-				});
-				this.visitedNodes.add(nodeAtIntersection.id);
-			}
+			return; // Skip this edge if it's not traversable
 		}
+
+		this._checkIntersections(edge);
+	}
+
+	_handleConeDetection(nodeAtIntersection) {
+		this._updateNodeState(nodeAtIntersection.id, {
+			explState: 'restricted',
+			visibility: 'visible'
+		});
+		this.visitedEdges
+			.filter((e) => e.from === nodeAtIntersection.id || e.to === nodeAtIntersection.id)
+			.forEach((e) => {
+				this._setEdgeIntraversable(e.id);
+			});
+	}
+
+	_markEdgeAsTraversed(edgeId) {
+		this._updateEdgeState(edgeId, { explState: 'visited', visibility: 'visible' });
 	}
 
 	// Get all edges originating from a given node
@@ -134,14 +138,17 @@ export class GraphExplorer {
 		});
 	}
 
-	// Check if there’s a cone (obstacle) at a given node
 	_hasCone(nodeId) {
-		return get(nodeStates)[nodeId]?.isObstacle || false;
+		const nodeState = get(nodeStates)[nodeId];
+		const isObstacle = nodeState?.isObstacle || false;
+		addLog(`Checking for cone at node '${nodeId}' - isObstacle: ${isObstacle}`, 'info');
+		return isObstacle;
 	}
 
 	_visitNode(nodeId) {
+		addLog(`Visiting node '${nodeId}'`, 'info');
 		this.visitedNodes.add(nodeId);
-		this._updateNodeState(nodeId, { explState: 'probed' });
+		this._updateNodeState(nodeId, { explState: 'visited', visibility: 'visible' });
 	}
 
 	_setEdgeIntraversable(edgeId) {
@@ -256,5 +263,57 @@ export class GraphExplorer {
 
 		// No nearby node found within the margin
 		return null;
+	}
+
+	_isNodeRestricted(nodeId) {
+		return get(nodeStates)[nodeId]?.explState === 'restricted';
+	}
+
+	_checkIntersections(edge) {
+		const { nodes, edges } = this.graph;
+		const [p1, q1] = [edge.from, edge.to].map((id) => nodes.find((node) => node.id === id));
+
+		for (const visitedEdgeId of this.visitedEdges) {
+			const visitedEdge = edges.find((e) => e.id === visitedEdgeId);
+			if (!visitedEdge) continue;
+
+			const [p2, q2] = [visitedEdge.from, visitedEdge.to].map((id) =>
+				nodes.find((node) => node.id === id)
+			);
+
+			// Check if the current edge intersects with the visited edge
+			if (!this._doIntersect(p1, q1, p2, q2)) continue;
+
+			const intersectionPoint = this._calculateIntersection(p1, q1, p2, q2);
+			if (!intersectionPoint) continue;
+
+			// If the visited edge is restricted, mark the current edge as restricted
+			if (get(edgeStates)[visitedEdgeId]?.explState === 'restricted') {
+				this._setEdgeIntraversable(edge.id);
+				addLog(
+					`Edge '${edge.id}' marked as restricted due to intersection with restricted edge '${visitedEdgeId}'`,
+					'info'
+				);
+				return; // Exit early since this edge is now restricted
+			}
+
+			// Handle node intersections if an intersection point is detected
+			const nodeAtIntersection = this._isNodeNearIntersection(intersectionPoint, 10);
+			if (!nodeAtIntersection || this.visitedNodes.has(nodeAtIntersection.id)) continue;
+
+			// Mark node and its connected edges as restricted if there's a cone
+			if (this._hasCone(nodeAtIntersection.id)) {
+				this._handleConeDetection(nodeAtIntersection);
+			} else {
+				addLog(
+					`Node '${nodeAtIntersection.id}' detected due to intersection of edges (${edge.from}, ${edge.to}) & (${visitedEdge.from}, ${visitedEdge.to}`,
+					'info'
+				);
+				this._updateNodeState(nodeAtIntersection.id, {
+					explState: 'probed',
+					visibility: 'visible'
+				});
+			}
+		}
 	}
 }
