@@ -8,7 +8,7 @@
 	} from '../stores.js';
 	import { runAlgorithm, simulateMapExploration } from '../algorithms.js';
 	import { get } from 'svelte/store';
-	import { resetExplorationStates } from '../utils.js';
+	import { resetExplorationStates, updateVisibility } from '../utils.js';
 
 	async function runSimulation() {
 		if ($executionMode === 'interactive') {
@@ -29,6 +29,8 @@
 			console.log('Parameterized run is not yet implemented.');
 		} else if ($executionMode === 'explore') {
 			resetExplorationStates();
+			updateVisibility($executionMode);
+
 			await simulateMapExploration();
 		} else {
 			console.error('option not selected correctly');
