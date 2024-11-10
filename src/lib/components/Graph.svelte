@@ -14,8 +14,7 @@
 	function updateVisibility(mode) {
 		nodeStates.update((states) => {
 			fixedNodes.forEach((node) => {
-				const isVisible =
-					mode === 'interactive' || (mode === 'mentalMap' && ['S'].includes(node.id));
+				const isVisible = mode === 'interactive' || (mode === 'explore' && ['S'].includes(node.id));
 				states[node.id] = {
 					...(states[node.id] || {}),
 					visibility: isVisible ? 'visible' : 'hidden'
@@ -27,8 +26,8 @@
 		edgeStates.update((states) => {
 			fixedEdges.forEach((edge) => {
 				let isVisible =
-					mode === 'interactive' || (mode === 'mentalMap' && [1, 2, 14].includes(edge.id));
-				if (get(edgeStates)[edge.id]?.type === 'dashed' && mode === 'mentalMap') {
+					mode === 'interactive' || (mode === 'explore' && [1, 2, 14].includes(edge.id));
+				if (get(edgeStates)[edge.id]?.type === 'dashed' && mode === 'explore') {
 					isVisible = false;
 				}
 				states[edge.id] = {
@@ -45,7 +44,7 @@
 </script>
 
 <section class="graph">
-	{#if $executionMode === 'interactive' || $executionMode === 'mentalMap'}
+	{#if $executionMode === 'interactive' || $executionMode === 'explore'}
 		{#each fixedNodes as node (node.id)}
 			<Node
 				id={node.id}
