@@ -21,6 +21,9 @@ export class GraphExplorer {
 		this.nodeStack = [];
 		this.delayInMilliseconds = delayInMilliseconds;
 		this.vectorToGoal = this._getGoalNodeVector();
+		this.targetSection = this._getNodeSection(
+			this.graph.nodes.find((n) => n.id === this.goalNodeId)
+		);
 	}
 
 	async explore() {
@@ -126,6 +129,16 @@ export class GraphExplorer {
 			y: goalNode.y - currentNode.y
 		};
 
+		const targetSection = this._getNodeSection(goalNode); // Determine target section based on goal
+		const currentSection = this._getNodeSection(currentNode);
+
+		// Define scoring adjustments
+		const sectionBoost = 3; // Boost for staying in the target section
+		const wrongDirectionPenalty = 0.5; // Penalty for wrong direction even within the target section
+		const directionBoost = 1.5; // Boost for correct direction within the target section
+		const returnBoost = 2; // Boost for returning to the target section
+		const furtherAwayPenalty = -2; // Strong penalty for moving further from the target section
+
 		const possibleEdges = this._getEdgesFromNode(nodeId).filter(
 			(e) =>
 				!this.visitedEdges.has(e.id) &&
@@ -133,8 +146,6 @@ export class GraphExplorer {
 				get(edgeStates)[e.id]?.type !== 'dashed' &&
 				get(edgeStates)[e.id]?.type !== 'restricted'
 		);
-
-		const penaltyFactor = 0.5; // This factor penalizes misaligned edges
 
 		possibleEdges.sort((edgeA, edgeB) => {
 			const vectorA = this._getEdgeVector(edgeA);
@@ -149,28 +160,69 @@ export class GraphExplorer {
 				const directionA = vectorA.x * vectorToGoal.x + vectorA.y * vectorToGoal.y;
 				const directionB = vectorB.x * vectorToGoal.x + vectorB.y * vectorToGoal.y;
 
-				// Apply penalty for edges pointing in the wrong direction
-				const scoreA = directionA > 0 ? alignmentA : alignmentA * penaltyFactor;
-				const scoreB = directionB > 0 ? alignmentB : alignmentB * penaltyFactor;
+				// Determine section of each target node
+				const targetNodeA = edgeA.to === nodeId ? edgeA.from : edgeA.to;
+				const targetNodeB = edgeB.to === nodeId ? edgeB.from : edgeB.to;
+				const sectionA = this._getNodeSection(this.graph.nodes.find((n) => n.id === targetNodeA));
+				const sectionB = this._getNodeSection(this.graph.nodes.find((n) => n.id === targetNodeB));
 
-				// Debugging: Log all values
+				// Scoring based on section proximity and direction
+				let scoreA = 0;
+				let scoreB = 0;
+
+				// Helper function to determine section distance
+				const getSectionDistance = (fromSection, toSection) => {
+					const sections = ['left', 'middle', 'right'];
+					return Math.abs(sections.indexOf(fromSection) - sections.indexOf(toSection));
+				};
+
+				// Section-based prioritization
+				const distanceA = getSectionDistance(currentSection, sectionA);
+				const distanceB = getSectionDistance(currentSection, sectionB);
+				const targetDistanceA = getSectionDistance(sectionA, targetSection);
+				const targetDistanceB = getSectionDistance(sectionB, targetSection);
+
+				// Score calculation with section proximity
+				if (sectionA === targetSection) {
+					scoreA += sectionBoost; // Boost for staying in the target section
+					scoreA += directionA > 0 ? directionBoost : alignmentA * wrongDirectionPenalty;
+				} else if (targetDistanceA < targetDistanceB) {
+					scoreA += returnBoost; // Prioritize moving closer to the target section
+				} else if (distanceA > distanceB) {
+					scoreA += alignmentA * furtherAwayPenalty; // Strong penalty for moving further away
+				} else {
+					scoreA += alignmentA * wrongDirectionPenalty; // Penalty for staying in the wrong section
+				}
+
+				if (sectionB === targetSection) {
+					scoreB += sectionBoost; // Boost for staying in the target section
+					scoreB += directionB > 0 ? directionBoost : alignmentB * wrongDirectionPenalty;
+				} else if (targetDistanceB < targetDistanceA) {
+					scoreB += returnBoost; // Prioritize moving closer to the target section
+				} else if (distanceB > distanceA) {
+					scoreB += alignmentB * furtherAwayPenalty; // Strong penalty for moving further away
+				} else {
+					scoreB += alignmentB * wrongDirectionPenalty; // Penalty for staying in the wrong section
+				}
+
+				// Debugging: Log values for clarity
 				addLog(
-					`Edge from '${edgeA.from}' to '${edgeA.to}' - Alignment: ${alignmentA}, Direction: ${directionA}, Score: ${scoreA}`,
+					`Edge from '${edgeA.from}' to '${edgeA.to}' - Section: ${sectionA}, Distance from target: ${targetDistanceA}, Score: ${scoreA}`,
 					'info'
 				);
 				addLog(
-					`Edge from '${edgeB.from}' to '${edgeB.to}' - Alignment: ${alignmentB}, Direction: ${directionB}, Score: ${scoreB}`,
+					`Edge from '${edgeB.from}' to '${edgeB.to}' - Section: ${sectionB}, Distance from target: ${targetDistanceB}, Score: ${scoreB}`,
 					'info'
 				);
 
 				// Sort by the composite score (higher is better)
 				return scoreA - scoreB;
 			}
-			return 0; // Keep the original order if no alignment can be calculated
+			return 0;
 		});
 
 		addLog(
-			`Possible edges from node '${nodeId}': ${JSON.stringify(
+			`Prioritized edges from node '${nodeId}' with section and direction priority: ${JSON.stringify(
 				possibleEdges.map((e) => {
 					const from = e.from === nodeId ? e.from : e.to;
 					const to = e.from === nodeId ? e.to : e.from;
@@ -398,5 +450,11 @@ export class GraphExplorer {
 				});
 			}
 		}
+	}
+
+	_getNodeSection(node) {
+		if (node.x < 186.67) return 'left';
+		if (node.x < 2 * 186.67) return 'middle';
+		return 'right';
 	}
 }
