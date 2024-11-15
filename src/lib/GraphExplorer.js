@@ -1,12 +1,13 @@
 import { get } from 'svelte/store';
 import { fixedNodes, fixedEdges } from './graphStructure';
-import { nodeStates, edgeStates } from './stores';
+import { nodeStates, edgeStates, selectedEndpoint } from './stores';
 import { delay } from './utils';
 import { addLog } from './logging';
 
 export class GraphExplorer {
 	constructor(startNodeId = 'S', delayInMilliseconds = 200) {
 		this.startNodeId = startNodeId;
+		this.goalNodeId = get(selectedEndpoint);
 		this.visitedNodes = new Set();
 		this.visitedEdges = new Set();
 		this.intraversibleEdges = new Set();
@@ -19,6 +20,7 @@ export class GraphExplorer {
 		};
 		this.nodeStack = [];
 		this.delayInMilliseconds = delayInMilliseconds;
+		this.vectorToGoal = this._getGoalNodeVector();
 	}
 
 	async explore() {
@@ -53,6 +55,10 @@ export class GraphExplorer {
 
 	async _exploreNode(nodeId) {
 		this._visitNode(nodeId);
+		if (nodeId === this.goalNodeId) {
+			this.nodeStack = [];
+			return;
+		}
 
 		let edges = this._getPossibleEdges(nodeId);
 
@@ -63,7 +69,6 @@ export class GraphExplorer {
 
 		await delay(this.delayInMilliseconds);
 
-		let selectRandomNode = true;
 		for (const edge of edges) {
 			if (!this.visitedEdges.has(edge.id)) {
 				await this._exploreEdge(edge, nodeId);
@@ -80,7 +85,47 @@ export class GraphExplorer {
 		}
 	}
 
+	_getGoalNodeVector() {
+		const startNode = this.graph.nodes.find((n) => n.id === this.startNodeId);
+		const goalNode = this.graph.nodes.find((n) => n.id === this.goalNodeId);
+
+		return {
+			x: goalNode.x - startNode.x,
+			y: goalNode.y - startNode.y
+		};
+	}
+
+	_getEdgeVector(edge) {
+		const fromNode = this.graph.nodes.find((node) => node.id === edge.from);
+		const toNode = this.graph.nodes.find((node) => node.id === edge.to);
+
+		if (fromNode && toNode) {
+			return {
+				x: toNode.x - fromNode.x,
+				y: toNode.y - fromNode.y
+			};
+		}
+		return null;
+	}
+
+	_calculateVectorAlignment(vector1, vector2) {
+		const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y;
+		const magnitude1 = Math.sqrt(vector1.x ** 2 + vector1.y ** 2);
+		const magnitude2 = Math.sqrt(vector2.x ** 2 + vector2.y ** 2);
+
+		return dotProduct / (magnitude1 * magnitude2); // Cosine similarity
+	}
+
 	_getPossibleEdges(nodeId) {
+		const goalNode = this.graph.nodes.find((n) => n.id === this.goalNodeId);
+		const currentNode = this.graph.nodes.find((n) => n.id === nodeId);
+
+		// Recalculate the vector to the goal based on the current node
+		const vectorToGoal = {
+			x: goalNode.x - currentNode.x,
+			y: goalNode.y - currentNode.y
+		};
+
 		const possibleEdges = this._getEdgesFromNode(nodeId).filter(
 			(e) =>
 				!this.visitedEdges.has(e.id) &&
@@ -88,6 +133,42 @@ export class GraphExplorer {
 				get(edgeStates)[e.id]?.type !== 'dashed' &&
 				get(edgeStates)[e.id]?.type !== 'restricted'
 		);
+
+		const penaltyFactor = 0.5; // This factor penalizes misaligned edges
+
+		possibleEdges.sort((edgeA, edgeB) => {
+			const vectorA = this._getEdgeVector(edgeA);
+			const vectorB = this._getEdgeVector(edgeB);
+
+			if (vectorA && vectorB) {
+				// Calculate alignment (cosine similarity) with the dynamic goal vector
+				let alignmentA = this._calculateVectorAlignment(vectorA, vectorToGoal);
+				let alignmentB = this._calculateVectorAlignment(vectorB, vectorToGoal);
+
+				// Calculate dot product to explicitly check direction
+				const directionA = vectorA.x * vectorToGoal.x + vectorA.y * vectorToGoal.y;
+				const directionB = vectorB.x * vectorToGoal.x + vectorB.y * vectorToGoal.y;
+
+				// Apply penalty for edges pointing in the wrong direction
+				const scoreA = directionA > 0 ? alignmentA : alignmentA * penaltyFactor;
+				const scoreB = directionB > 0 ? alignmentB : alignmentB * penaltyFactor;
+
+				// Debugging: Log all values
+				addLog(
+					`Edge from '${edgeA.from}' to '${edgeA.to}' - Alignment: ${alignmentA}, Direction: ${directionA}, Score: ${scoreA}`,
+					'info'
+				);
+				addLog(
+					`Edge from '${edgeB.from}' to '${edgeB.to}' - Alignment: ${alignmentB}, Direction: ${directionB}, Score: ${scoreB}`,
+					'info'
+				);
+
+				// Sort by the composite score (higher is better)
+				return scoreA - scoreB;
+			}
+			return 0; // Keep the original order if no alignment can be calculated
+		});
+
 		addLog(
 			`Possible edges from node '${nodeId}': ${JSON.stringify(
 				possibleEdges.map((e) => {

@@ -59,7 +59,7 @@ async function runSimulationAlgorithm(startNodeId, goalNodeId, vehicleParams, an
 }
 
 async function exploreMap() {
-	const graphExplorer = new GraphExplorer('S', 150);
+	const graphExplorer = new GraphExplorer('S', 200);
 	await graphExplorer.explore();
 }
 

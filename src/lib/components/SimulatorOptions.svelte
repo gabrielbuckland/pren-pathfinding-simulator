@@ -1,6 +1,7 @@
 <script>
 	import { selectedEndpoint, animationSpeed, executionMode } from '../stores.js';
 	import { get } from 'svelte/store';
+	import EndPointSelection from './EndPointSelection.svelte';
 
 	let numGraphs = 1;
 	let exportEnabled = false;
@@ -22,28 +23,12 @@
 		/>
 	</label>
 
-	<div class="endpoint-selection">
-		<label>Select endpoint:</label>
-		<div class="radio-buttons">
-			<label>
-				<input type="radio" name="endpoint" value="A" bind:group={$selectedEndpoint} />
-				A
-			</label>
-			<label>
-				<input type="radio" name="endpoint" value="B" bind:group={$selectedEndpoint} />
-				B
-			</label>
-			<label>
-				<input type="radio" name="endpoint" value="C" bind:group={$selectedEndpoint} />
-				C
-			</label>
-		</div>
-	</div>
-
 	<label class="checkbox-label">
 		<input type="checkbox" bind:checked={exportEnabled} />
 		Create export
 	</label>
+
+	<EndPointSelection />
 
 	<label>
 		Animation speed (ms):
@@ -64,25 +49,6 @@
 
 	.bold {
 		font-weight: bold;
-	}
-
-	.endpoint-selection {
-		margin-bottom: 1rem;
-	}
-
-	.radio-buttons {
-		display: flex;
-		gap: 1rem;
-		margin-top: 0.5rem;
-	}
-
-	.radio-buttons label {
-		display: flex;
-		align-items: center;
-	}
-
-	.radio-buttons input[type='radio'] {
-		margin-right: 0.5rem;
 	}
 
 	label {

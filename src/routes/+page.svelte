@@ -16,6 +16,7 @@
 	} from '../lib/graphStructure.js';
 	import ExecutionOption from '../lib/components/ExecutionOption.svelte';
 	import RunSimulationButton from '../lib/components/RunSimulationButton.svelte';
+	import EndPointSelection from '../lib/components/EndPointSelection.svelte';
 
 	function resetGraph() {
 		nodeStates.set(defaultNodeStates);
@@ -73,6 +74,10 @@
 			<Title>Execution mode:</Title>
 			<ExecutionOption />
 		</div>
+
+		{#if $executionMode === 'explore'}
+			<div class="section"><EndPointSelection /></div>
+		{/if}
 		{#if $executionMode !== 'explore'}
 			<div class="section">
 				<Title>Vehicle-Parameters:</Title>
