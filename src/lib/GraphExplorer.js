@@ -5,7 +5,7 @@ import { delay } from './utils';
 import { addLog } from './logging';
 
 export class GraphExplorer {
-	constructor(startNodeId = 'S') {
+	constructor(startNodeId = 'S', delayInMilliseconds = 200) {
 		this.startNodeId = startNodeId;
 		this.visitedNodes = new Set();
 		this.visitedEdges = new Set();
@@ -18,6 +18,7 @@ export class GraphExplorer {
 			edges: fixedEdges
 		};
 		this.nodeStack = [];
+		this.delayInMilliseconds = delayInMilliseconds;
 	}
 
 	async explore() {
@@ -34,7 +35,7 @@ export class GraphExplorer {
 
 			// Mark the leading edge as traversed, if it exists, before visiting the node
 			if (leadingEdgeId !== null) {
-				await delay(200); // Optional: Add a small delay to allow visual emphasis on the edge before the node
+				await delay(this.delayInMilliseconds); // Optional: Add a small delay to allow visual emphasis on the edge before the node
 				this._markEdgeAsTraversed(leadingEdgeId);
 
 				const leadingEdge = this.graph.edges.find((edge) => edge.id === leadingEdgeId);
@@ -60,8 +61,9 @@ export class GraphExplorer {
 			return; // Backtrack if there are no possible edges
 		}
 
-		await delay(200);
+		await delay(this.delayInMilliseconds);
 
+		let selectRandomNode = true;
 		for (const edge of edges) {
 			if (!this.visitedEdges.has(edge.id)) {
 				await this._exploreEdge(edge, nodeId);
@@ -101,7 +103,7 @@ export class GraphExplorer {
 	}
 
 	async _exploreEdge(edge, currentNode) {
-		await delay(200);
+		await delay(this.delayInMilliseconds);
 		addLog(`Exploring edge from '${edge.from}' to '${edge.to}'`);
 		const targetNodeId = edge.to === currentNode ? edge.from : edge.to; // Ensure target node is the opposite node
 		const edgeId = edge.id;
@@ -117,7 +119,6 @@ export class GraphExplorer {
 			this._setEdgeIntraversable(edgeId);
 			this._updateNodeState(targetNodeId, { explState: 'restricted', visibility: 'visible' });
 
-			const edge = this.graph.edges.find((e) => e.id === edgeId);
 			const from = edge.from === currentNode ? edge.from : edge.to;
 			const to = edge.from === currentNode ? edge.to : edge.from;
 
@@ -302,6 +303,19 @@ export class GraphExplorer {
 
 			const intersectionPoint = this._calculateIntersection(p1, q1, p2, q2);
 			if (!intersectionPoint) continue;
+
+			const nodeAtIntersection = this._isNodeNearIntersection(intersectionPoint, 10);
+			if (nodeAtIntersection && get(nodeStates)[nodeAtIntersection.id]?.explState === 'default') {
+				const from = edge.from === nodeAtIntersection.id ? edge.from : edge.to;
+				const to = edge.from === nodeAtIntersection.id ? edge.to : edge.from;
+				addLog(
+					`Node '${nodeAtIntersection.id}' detected due to intersection of 'Edge (${to} - ${from})' and 'Edge (${visitedEdge.to} - ${visitedEdge.from}'`
+				);
+				this._updateNodeState(nodeAtIntersection.id, {
+					explState: 'probed',
+					visibility: 'visible'
+				});
+			}
 		}
 	}
 }
