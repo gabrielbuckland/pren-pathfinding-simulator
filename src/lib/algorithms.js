@@ -6,7 +6,7 @@ import { delay } from './utils.js';
 import { runAStar } from './algorithms/aStar.js';
 import { runDStarLite } from './algorithms/dStarLite.js';
 import { runDijkstra } from './algorithms/dijkstra.js';
-import { GraphExplorer } from './GraphExplorer.js';
+import { GraphExplorer } from './graphExplorer.js';
 
 export async function simulateMapExploration() {
 	algorithmLogs.set([]);

@@ -5,7 +5,11 @@ import { delay } from './utils';
 import { addLog } from './logging';
 
 export class GraphExplorer {
-	constructor(startNodeId = 'S', delayInMilliseconds = 200) {
+	constructor(
+		startNodeId = 'S',
+		delayInMilliseconds = 200,
+		{ nodeStates, edgeStates, $selectedEndpoint } = {}
+	) {
 		this.startNodeId = startNodeId;
 		this.goalNodeId = get(selectedEndpoint);
 		this.visitedNodes = new Set();
@@ -218,14 +222,6 @@ export class GraphExplorer {
 					scoreA += directionalScoreA;
 					scoreB += directionalScoreB;
 				}
-
-				// Debugging: Log values for clarity
-				console.log(
-					`Edge from '${edgeA.from}' to '${edgeA.to}' - Section: ${sectionA}, Target Distance: ${targetDistanceA}, Direction: ${directionA}, Score: ${scoreA}`
-				);
-				console.log(
-					`Edge from '${edgeB.from}' to '${edgeB.to}' - Section: ${sectionB}, Target Distance: ${targetDistanceB}, Direction: ${directionB}, Score: ${scoreB}`
-				);
 
 				// Sort by the composite score (higher is better)
 				return scoreA - scoreB;
