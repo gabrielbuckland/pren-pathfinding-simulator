@@ -7,7 +7,7 @@
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import Logger from '../lib/components/Logger.svelte';
 	import { nodeStates, edgeStates, executionMode } from '../lib/stores.js';
-	import { resetExplorationStates } from '../lib/utils';
+	import { resetExplorationStates, generateRandomGraph } from '../lib/utils';
 	import {
 		fixedNodes,
 		fixedEdges,
@@ -28,23 +28,7 @@
 	}
 
 	function randomizeGraph() {
-		const randomNodes = {};
-		fixedNodes.forEach((node) => {
-			randomNodes[node.id] = {
-				isObstacle: Math.random() < 0.3,
-				explState: 'default'
-			};
-		});
-
-		const edgeTypes = ['solid', 'dashed', 'barrier'];
-		const randomEdges = {};
-		fixedEdges.forEach((edge) => {
-			randomEdges[edge.id] = {
-				type: edgeTypes[Math.floor(Math.random() * edgeTypes.length)],
-				explState: 'default'
-			};
-		});
-
+		const {randomNodes, randomEdges} = generateRandomGraph();
 		nodeStates.set(randomNodes);
 		edgeStates.set(randomEdges);
 	}
