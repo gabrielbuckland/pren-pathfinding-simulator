@@ -135,7 +135,7 @@ export class GraphExplorer {
 		// Define scoring adjustments
 		const sectionBoost = 3; // Boost for staying in the target section
 		const wrongDirectionPenalty = 0.5; // Penalty for wrong direction even within the target section
-		const directionBoost = 1.5; // Boost for correct direction within the target section
+		const directionBoost = 3; // Boost for correct direction within the target section
 		const returnBoost = 2; // Boost for returning to the target section
 		const furtherAwayPenalty = -2; // Strong penalty for moving further from the target section
 
@@ -148,17 +148,31 @@ export class GraphExplorer {
 		);
 
 		possibleEdges.sort((edgeA, edgeB) => {
-			const vectorA = this._getEdgeVector(edgeA);
-			const vectorB = this._getEdgeVector(edgeB);
+			// Adjust the direction of the vector based on the `nodeId` position
+			const vectorA =
+				edgeA.from === nodeId
+					? this._getEdgeVector(edgeA) // Edge is correctly directed
+					: { x: -this._getEdgeVector(edgeA).x, y: -this._getEdgeVector(edgeA).y }; // Reverse the vector
+
+			const vectorB =
+				edgeB.from === nodeId
+					? this._getEdgeVector(edgeB)
+					: { x: -this._getEdgeVector(edgeB).x, y: -this._getEdgeVector(edgeB).y };
 
 			if (vectorA && vectorB) {
 				// Calculate alignment (cosine similarity) with the dynamic goal vector
-				let alignmentA = this._calculateVectorAlignment(vectorA, vectorToGoal);
-				let alignmentB = this._calculateVectorAlignment(vectorB, vectorToGoal);
+				const alignmentA = this._calculateVectorAlignment(vectorA, vectorToGoal);
+				const alignmentB = this._calculateVectorAlignment(vectorB, vectorToGoal);
 
-				// Calculate dot product to explicitly check direction
-				const directionA = vectorA.x * vectorToGoal.x + vectorA.y * vectorToGoal.y;
-				const directionB = vectorB.x * vectorToGoal.x + vectorB.y * vectorToGoal.y;
+				// Normalize the dot product to check the direction explicitly
+				const magnitudeGoal = Math.sqrt(vectorToGoal.x ** 2 + vectorToGoal.y ** 2);
+				const magnitudeA = Math.sqrt(vectorA.x ** 2 + vectorA.y ** 2);
+				const magnitudeB = Math.sqrt(vectorB.x ** 2 + vectorB.y ** 2);
+
+				const directionA =
+					(vectorA.x * vectorToGoal.x + vectorA.y * vectorToGoal.y) / (magnitudeA * magnitudeGoal);
+				const directionB =
+					(vectorB.x * vectorToGoal.x + vectorB.y * vectorToGoal.y) / (magnitudeB * magnitudeGoal);
 
 				// Determine section of each target node
 				const targetNodeA = edgeA.to === nodeId ? edgeA.from : edgeA.to;
@@ -166,59 +180,57 @@ export class GraphExplorer {
 				const sectionA = this._getNodeSection(this.graph.nodes.find((n) => n.id === targetNodeA));
 				const sectionB = this._getNodeSection(this.graph.nodes.find((n) => n.id === targetNodeB));
 
-				// Scoring based on section proximity and direction
-				let scoreA = 0;
-				let scoreB = 0;
-
 				// Helper function to determine section distance
 				const getSectionDistance = (fromSection, toSection) => {
 					const sections = ['left', 'middle', 'right'];
 					return Math.abs(sections.indexOf(fromSection) - sections.indexOf(toSection));
 				};
 
-				// Section-based prioritization
-				const distanceA = getSectionDistance(currentSection, sectionA);
-				const distanceB = getSectionDistance(currentSection, sectionB);
+				// Section distances
 				const targetDistanceA = getSectionDistance(sectionA, targetSection);
 				const targetDistanceB = getSectionDistance(sectionB, targetSection);
 
-				// Score calculation with section proximity
-				if (sectionA === targetSection) {
-					scoreA += sectionBoost; // Boost for staying in the target section
-					scoreA += directionA > 0 ? directionBoost : alignmentA * wrongDirectionPenalty;
-				} else if (targetDistanceA < targetDistanceB) {
-					scoreA += returnBoost; // Prioritize moving closer to the target section
-				} else if (distanceA > distanceB) {
-					scoreA += alignmentA * furtherAwayPenalty; // Strong penalty for moving further away
-				} else {
-					scoreA += alignmentA * wrongDirectionPenalty; // Penalty for staying in the wrong section
+				// Score calculation
+				let scoreA = 0;
+				let scoreB = 0;
+
+				// **Step 1**: Prioritize sections
+				if (sectionA === targetSection) scoreA += sectionBoost; // Staying in the target section
+				if (sectionB === targetSection) scoreB += sectionBoost;
+
+				if (targetDistanceA < targetDistanceB) {
+					scoreA += returnBoost; // Moving closer to the target section
+				} else if (targetDistanceB < targetDistanceA) {
+					scoreB += returnBoost;
 				}
 
-				if (sectionB === targetSection) {
-					scoreB += sectionBoost; // Boost for staying in the target section
-					scoreB += directionB > 0 ? directionBoost : alignmentB * wrongDirectionPenalty;
-				} else if (targetDistanceB < targetDistanceA) {
-					scoreB += returnBoost; // Prioritize moving closer to the target section
-				} else if (distanceB > distanceA) {
-					scoreB += alignmentB * furtherAwayPenalty; // Strong penalty for moving further away
-				} else {
-					scoreB += alignmentB * wrongDirectionPenalty; // Penalty for staying in the wrong section
+				// **Step 2**: Apply directional scores if both edges lead to the same section
+				if (targetDistanceA === targetDistanceB) {
+					const directionalScoreA =
+						directionA >= 0
+							? alignmentA + directionBoost * directionA
+							: alignmentA * wrongDirectionPenalty;
+					const directionalScoreB =
+						directionB >= 0
+							? alignmentB + directionBoost * directionB
+							: alignmentB * wrongDirectionPenalty;
+
+					scoreA += directionalScoreA;
+					scoreB += directionalScoreB;
 				}
 
 				// Debugging: Log values for clarity
-				addLog(
-					`Edge from '${edgeA.from}' to '${edgeA.to}' - Section: ${sectionA}, Distance from target: ${targetDistanceA}, Score: ${scoreA}`,
-					'info'
+				console.log(
+					`Edge from '${edgeA.from}' to '${edgeA.to}' - Section: ${sectionA}, Target Distance: ${targetDistanceA}, Direction: ${directionA}, Score: ${scoreA}`
 				);
-				addLog(
-					`Edge from '${edgeB.from}' to '${edgeB.to}' - Section: ${sectionB}, Distance from target: ${targetDistanceB}, Score: ${scoreB}`,
-					'info'
+				console.log(
+					`Edge from '${edgeB.from}' to '${edgeB.to}' - Section: ${sectionB}, Target Distance: ${targetDistanceB}, Direction: ${directionB}, Score: ${scoreB}`
 				);
 
 				// Sort by the composite score (higher is better)
 				return scoreA - scoreB;
 			}
-			return 0;
+			return 0; // Keep the original order if no alignment can be calculated
 		});
 
 		addLog(
