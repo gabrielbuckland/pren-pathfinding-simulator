@@ -72,10 +72,12 @@ function buildAdjacencyList(edges) {
 	fixedNodes.forEach(node => {
 		adjacencyList[node.id] = [];
 	});
+
 	edges.forEach(edge => {
 		adjacencyList[edge.from].push({ neighborId: edge.to, edge });
 		adjacencyList[edge.to].push({ neighborId: edge.from, edge });
 	});
+
 	return adjacencyList;
 }
 
