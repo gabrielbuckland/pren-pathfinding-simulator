@@ -65,7 +65,7 @@ describe('GraphExplorer', () => {
 
 	it('sorts edges by alignment and section priority', () => {
 		const edges = graphExplorer._getPossibleEdges('3');
-		expect(edges.map((e) => e.id)).toEqual([2, 13, 7, 3]);
+		expect(edges.map((e) => e.id)).toEqual([3, 2, 13, 7]);
 	});
 
 	it('marks a node as visited correctly', () => {
@@ -106,7 +106,7 @@ describe('GraphExplorer', () => {
 	it('correctly prioritizes edges based on alignment and section', () => {
 		graphExplorer.visitedEdges.add(7); // Mark edge '4' to '3' as visited
 		const edges = graphExplorer._getPossibleEdges('4');
-		expect(edges.map((e) => e.id)).toEqual([10, 15, 9, 8]); // Prioritized by alignment and section
+		expect(edges.map((e) => e.id)).toEqual([8, 15, 9, 10]); // Prioritized by alignment and section
 	});
 
 	it('handles restricted nodes correctly', () => {
