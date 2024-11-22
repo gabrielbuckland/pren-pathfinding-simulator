@@ -69,11 +69,11 @@ function getRandomSubset(array, maxSize) {
 // Helper function to build adjacency list from fixedEdges
 function buildAdjacencyList(edges) {
 	const adjacencyList = {};
-	fixedNodes.forEach(node => {
+	fixedNodes.forEach((node) => {
 		adjacencyList[node.id] = [];
 	});
 
-	edges.forEach(edge => {
+	edges.forEach((edge) => {
 		adjacencyList[edge.from].push({ neighborId: edge.to, edge });
 		adjacencyList[edge.to].push({ neighborId: edge.from, edge });
 	});
@@ -109,39 +109,39 @@ function findPathEdges(startNodeId, endNodeId) {
 	return null;
 }
 
-export function generateRandomGraph() {
-	const endNodes = ['A', 'B', 'C'];
+export function generateRandomGraph(randomNodeId = 'A') {
 	const maxObstacles = 3;
 	const maxNonSolidEdges = 6;
 
 	let randomNodes = {};
 	let randomEdges = {};
 
-	// Step 1: Randomly select one end node to ensure a path exists
-	const targetEndNode = endNodes[Math.floor(Math.random() * endNodes.length)];
-
-	// Step 2: Find a path from 'S' to the targetEndNode
-	const pathEdges = findPathEdges('S', targetEndNode);
+	// Step 2: Find a path from 'S' to the randomNodeId
+	const pathEdges = findPathEdges('S', randomNodeId);
 
 	// If no path is found (which shouldn't happen), throw an error
-	if (!pathEdges) throw new Error(`No path found from 'S' to '${targetEndNode}' in the fixed graph.`);
+	if (!pathEdges)
+		throw new Error(`No path found from 'S' to '${randomNodeId}' in the fixed graph.`);
 
 	// Collect nodes and edges in the path
 	const pathNodeIds = new Set();
 	const pathEdgeIds = new Set();
-	pathEdges.forEach(edge => {
+	pathEdges.forEach((edge) => {
 		pathEdgeIds.add(edge.id);
 		pathNodeIds.add(edge.from);
 		pathNodeIds.add(edge.to);
 	});
 
 	// Step 3: Randomly assign obstacles to other nodes (excluding 'S' and path nodes)
-	const allNodeIds = fixedNodes.map(node => node.id);
-	const nonPathNodeIds = allNodeIds.filter(id => id !== 'S' && !pathNodeIds.has(id));
+	const allNodeIds = fixedNodes.map((node) => node.id);
+	const nonPathNodeIds = allNodeIds.filter((id) => id !== 'S' && !pathNodeIds.has(id));
 
-	const obstacleNodeIds = getRandomSubset(nonPathNodeIds, Math.min(maxObstacles, nonPathNodeIds.length));
+	const obstacleNodeIds = getRandomSubset(
+		nonPathNodeIds,
+		Math.min(maxObstacles, nonPathNodeIds.length)
+	);
 
-	allNodeIds.forEach(nodeId => {
+	allNodeIds.forEach((nodeId) => {
 		const isObstacle = obstacleNodeIds.includes(nodeId);
 		randomNodes[nodeId] = {
 			isObstacle,
@@ -151,13 +151,13 @@ export function generateRandomGraph() {
 	});
 
 	// Step 4: Randomly assign edge types to other edges (excluding path edges)
-	const allEdgeIds = fixedEdges.map(edge => edge.id);
-	const nonPathEdgeIds = allEdgeIds.filter(id => !pathEdgeIds.has(id));
+	const allEdgeIds = fixedEdges.map((edge) => edge.id);
+	const nonPathEdgeIds = allEdgeIds.filter((id) => !pathEdgeIds.has(id));
 
 	const maxEdgesToChange = Math.min(maxNonSolidEdges, nonPathEdgeIds.length);
 	const edgesToChangeIds = getRandomSubset(nonPathEdgeIds, maxEdgesToChange);
 
-	fixedEdges.forEach(edge => {
+	fixedEdges.forEach((edge) => {
 		let type = 'solid';
 		let traversable = true;
 
@@ -180,7 +180,7 @@ export function generateRandomGraph() {
 
 	// Step 5: Verify that the total number of 'dashed' or 'barrier' edges does not exceed 6
 	const nonSolidEdgeCount = Object.values(randomEdges).filter(
-		edge => edge.type === 'dashed' || edge.type === 'barrier'
+		(edge) => edge.type === 'dashed' || edge.type === 'barrier'
 	).length;
 
 	if (nonSolidEdgeCount > maxNonSolidEdges) {
@@ -189,7 +189,7 @@ export function generateRandomGraph() {
 	}
 
 	// Step 6: Ensure that the path from 'S' to the selected end node is valid
-	if (!hasValidPath(randomNodes, randomEdges, 'S', targetEndNode)) {
+	if (!hasValidPath(randomNodes, randomEdges, 'S', randomNodeId)) {
 		// If the path is invalid due to obstacles, regenerate the graph
 		return generateRandomGraph();
 	}
@@ -200,11 +200,11 @@ export function generateRandomGraph() {
 // Function to check if a valid path exists between two nodes
 function hasValidPath(randomNodes, randomEdges, startNodeId, endNodeId) {
 	const adjacencyList = {};
-	Object.keys(randomNodes).forEach(nodeId => {
+	Object.keys(randomNodes).forEach((nodeId) => {
 		adjacencyList[nodeId] = [];
 	});
 
-	fixedEdges.forEach(edge => {
+	fixedEdges.forEach((edge) => {
 		const edgeState = randomEdges[edge.id];
 		if (edgeState.traversable) {
 			const fromNodeState = randomNodes[edge.from];
@@ -228,7 +228,7 @@ function hasValidPath(randomNodes, randomEdges, startNodeId, endNodeId) {
 			return true;
 		}
 
-		adjacencyList[currentNode].forEach(neighbor => {
+		adjacencyList[currentNode].forEach((neighbor) => {
 			if (!visited.has(neighbor)) {
 				visited.add(neighbor);
 				queue.push(neighbor);
@@ -237,4 +237,9 @@ function hasValidPath(randomNodes, randomEdges, startNodeId, endNodeId) {
 	}
 
 	return false;
+}
+
+export function getRandomGoalNode() {
+	const goalNodes = ['A', 'B', 'C'];
+	return goalNodes[Math.floor(Math.random() * goalNodes.length)];
 }

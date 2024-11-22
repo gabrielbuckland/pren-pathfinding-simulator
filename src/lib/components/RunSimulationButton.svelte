@@ -4,9 +4,10 @@
 		vehicleParameters,
 		selectedAlgorithm,
 		animationSpeed,
-		executionMode
+		executionMode,
+		numberOfRuns
 	} from '../stores.js';
-	import { runAlgorithm, simulateMapExploration } from '../algorithms.js';
+	import { runAlgorithm, simulateMapExploration, startParameterizedRun } from '../algorithms.js';
 	import { get } from 'svelte/store';
 	import { resetExplorationStates, updateVisibility } from '../utils.js';
 
@@ -26,7 +27,7 @@
 				console.error('Error running simulation:', error);
 			}
 		} else if ($executionMode === 'parameterized') {
-			console.log('Parameterized run is not yet implemented.');
+			await startParameterizedRun($numberOfRuns);
 		} else if ($executionMode === 'explore') {
 			resetExplorationStates();
 			updateVisibility($executionMode);

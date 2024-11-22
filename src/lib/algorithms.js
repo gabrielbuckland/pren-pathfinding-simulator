@@ -2,11 +2,47 @@ import { nodeStates, edgeStates, algorithmLogs } from './stores.js';
 import { fixedEdges, fixedNodes } from './graphStructure.js';
 import { get } from 'svelte/store';
 import { addLog } from './logging.js';
-import { delay } from './utils.js';
+import { delay, generateRandomGraph, getRandomGoalNode } from './utils.js';
 import { runAStar } from './algorithms/aStar.js';
 import { runDStarLite } from './algorithms/dStarLite.js';
 import { runDijkstra } from './algorithms/dijkstra.js';
 import { GraphExplorer } from './graphExplorer.js';
+
+export async function startParameterizedRun(numberOfRounds) {
+	const log = [];
+	let counter = 0;
+	while (counter < numberOfRounds) {
+		const randomGoalNode = getRandomGoalNode();
+		const graph = generateRandomGraph(randomGoalNode);
+
+		const graphExplorer = new GraphExplorer('S', 100, {
+			exMode: 'parameterized',
+			endPoint: randomGoalNode
+		});
+
+		const startTime = new Date().getTime();
+		await graphExplorer.explore();
+		const endTime = new Date().getTime();
+
+		if (!graphExplorer.hasReachedGoal()) {
+			continue;
+		}
+
+		const logEntry = {
+			deltaTime: endTime - startTime,
+			graph: {
+				nodes: graph.randomNodes,
+				edges: graph.randomEdges
+			}
+		};
+
+		console.log(JSON.stringify(graphExplorer.getTraversedEdges() ?? 'not here'));
+		addLog(JSON.stringify(logEntry), 'info');
+		log.push(logEntry);
+		counter++;
+	}
+	console.log(log);
+}
 
 export async function simulateMapExploration() {
 	algorithmLogs.set([]);

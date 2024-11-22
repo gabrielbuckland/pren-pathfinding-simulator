@@ -7,7 +7,7 @@
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import Logger from '../lib/components/Logger.svelte';
 	import { nodeStates, edgeStates, executionMode } from '../lib/stores.js';
-	import { resetExplorationStates, generateRandomGraph } from '../lib/utils';
+	import { resetExplorationStates, generateRandomGraph, getRandomGoalNode } from '../lib/utils';
 	import {
 		fixedNodes,
 		fixedEdges,
@@ -17,6 +17,7 @@
 	import ExecutionOption from '../lib/components/ExecutionOption.svelte';
 	import RunSimulationButton from '../lib/components/RunSimulationButton.svelte';
 	import EndPointSelection from '../lib/components/EndPointSelection.svelte';
+	import NumberOfRunsInput from '../lib/components/NumberOfRunsInput.svelte';
 
 	function resetGraph() {
 		nodeStates.set(defaultNodeStates);
@@ -28,7 +29,8 @@
 	}
 
 	function randomizeGraph() {
-		const {randomNodes, randomEdges} = generateRandomGraph();
+		const randomNodeId = getRandomGoalNode();
+		const { randomNodes, randomEdges } = generateRandomGraph(randomNodeId);
 		nodeStates.set(randomNodes);
 		edgeStates.set(randomEdges);
 	}
@@ -59,10 +61,7 @@
 			<ExecutionOption />
 		</div>
 
-		{#if $executionMode === 'explore'}
-			<div class="section"><EndPointSelection /></div>
-		{/if}
-		{#if $executionMode !== 'explore'}
+		{#if $executionMode === 'interactive'}
 			<div class="section">
 				<Title>Vehicle-Parameters:</Title>
 				<VehicleParameters />
@@ -76,6 +75,21 @@
 				<Title>Simulator-Options:</Title>
 				<SimulatorOptions />
 			</div>
+		{/if}
+
+		{#if $executionMode === 'parameterized'}
+			<div class="section">
+				<Title>Vehicle-Parameters:</Title>
+				<VehicleParameters />
+			</div>
+			<div class="section">
+				<Title>Number of runs:</Title>
+				<NumberOfRunsInput />
+			</div>
+		{/if}
+
+		{#if $executionMode === 'explore'}
+			<div class="section"><EndPointSelection /></div>
 		{/if}
 
 		<RunSimulationButton />

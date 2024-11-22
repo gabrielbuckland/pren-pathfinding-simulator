@@ -30,3 +30,6 @@ export const algorithmLogs = writable([]);
 
 // New store for structured logs
 export const structuredLogs = writable([]);
+
+// New store for number of parameterized runs
+export const numberOfRuns = writable(1);

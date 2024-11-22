@@ -1,4 +1,4 @@
-import { algorithmLogs, structuredLogs } from './stores.js';
+import { algorithmLogs, structuredLogs, executionMode } from './stores.js';
 
 /**
  * Adds a log message to the algorithmLogs store and creates a structured log.
