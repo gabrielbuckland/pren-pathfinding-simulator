@@ -1,5 +1,5 @@
 <script>
-	import Container from '../lib/components/Container.svelte';
+	import GraphViewer from '../lib/components/GraphViewer.svelte';
 	import Graph from '../lib/components/Graph.svelte';
 	import Title from '../lib/components/Title.svelte';
 	import VehicleParameters from '../lib/components/VehicleParameters.svelte';
@@ -41,7 +41,7 @@
 	<meta name="description" content="Simulator" />
 </svelte:head>
 
-<Container>
+<GraphViewer>
 	<div slot="left" class="left-pane">
 		<div class="title-reset-container">
 			<Title>Graph</Title>
@@ -98,7 +98,7 @@
 	<div slot="right-bottom" class="right-bottom-pane">
 		<Logger />
 	</div>
-</Container>
+</GraphViewer>
 
 <style>
 	.left-pane {

@@ -1,4 +1,4 @@
-<div class="container">
+<div class="graph-viewer">
 	<div class="pane left-pane">
 		<slot name="left"></slot>
 	</div>
@@ -15,7 +15,7 @@
 </div>
 
 <style>
-	.container {
+	.graph-viewer {
 		display: grid;
 		grid-template-columns: 4fr 6fr;
 		grid-template-rows: 100vh;
