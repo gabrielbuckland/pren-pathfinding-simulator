@@ -1,4 +1,4 @@
-@startuml components-diagramm
+@startuml
 skinparam componentStyle uml
 skinparam backgroundColor #FAFAFA
 skinparam component {
@@ -8,20 +8,22 @@ skinparam component {
     FontSize 14
 }
 
-' Components
 component "GraphViewer" as GraphViewer
-component "DashboardConfig" as DashboardConfig
-component "LogViewer" as LogViewer
 component "GraphExplorer" as GraphExplorer
+component "LogViewer" as LogViewer
+component "DashboardViewer" as DashboardViewer
 
-' Shared Stores
-database "GraphStructure" as GraphStructure
-rectangle "Log Store" as LogStore
+rectangle "GraphStructure" as GraphStructure <<store>>
+rectangle "Logs" as Logs <<store>>
+rectangle "Configs" as Configs <<store>>
 
-' Relationships
-GraphViewer --> GraphExplorer : View/Edit Graph
-DashboardConfig --> GraphExplorer : Configure Simulation
+' Place LogViewer explicitly under Logs
+LogViewer -up-> Logs : Read/Clear Logs
+
+' Other Relationships
+GraphViewer --> GraphStructure : View/Update Graph
 GraphExplorer --> GraphStructure : Read/Write Data
-GraphExplorer --> LogStore : Append/Clear Logs
-LogViewer --> LogStore : Read Logs
+GraphExplorer --> Logs : Append Logs
+GraphExplorer --> Configs : Read/Write Data
+DashboardViewer --> Configs : Read/Write Data
 @enduml

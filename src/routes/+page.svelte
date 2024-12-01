@@ -1,19 +1,12 @@
 <script>
 	import Container from '../lib/components/Container.svelte';
 	import Title from '../lib/components/Title.svelte';
-	import VehicleParameters from '../lib/components/VehicleParameters.svelte';
-	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
-	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
 	import LogViewer from '../lib/components/LogViewer.svelte';
 	import { nodeStates, edgeStates, executionMode } from '../lib/stores.js';
 	import { resetExplorationStates, generateRandomGraph, getRandomGoalNode } from '../lib/utils';
 	import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
-	import ExecutionOption from '../lib/components/ExecutionOption.svelte';
-	import RunSimulationButton from '../lib/components/RunSimulationButton.svelte';
-	import EndPointSelection from '../lib/components/EndPointSelection.svelte';
-	import NumberOfRunsInput from '../lib/components/NumberOfRunsInput.svelte';
 	import GraphViewer from '../lib/components/GraphViewer.svelte';
-	import DashboardConfig from '../lib/components/DashboardConfig.svelte';
+	import DashboardViewer from '../lib/components/DashboardViewer.svelte';
 
 	function resetGraph() {
 		nodeStates.set(defaultNodeStates);
@@ -51,7 +44,7 @@
 	</div>
 
 	<div slot="right-top" class="right-top-pane">
-		<DashboardConfig />
+		<DashboardViewer />
 	</div>
 
 	<div slot="right-bottom" class="right-bottom-pane">
