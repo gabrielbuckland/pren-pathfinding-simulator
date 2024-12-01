@@ -1,0 +1,27 @@
+@startuml components-diagramm
+skinparam componentStyle uml
+skinparam backgroundColor #FAFAFA
+skinparam component {
+    BackgroundColor #E3F2FD
+    BorderColor #1E88E5
+    FontColor black
+    FontSize 14
+}
+
+' Components
+component "GraphViewer" as GraphViewer
+component "DashboardConfig" as DashboardConfig
+component "LogViewer" as LogViewer
+component "GraphExplorer" as GraphExplorer
+
+' Shared Stores
+database "GraphStructure" as GraphStructure
+rectangle "Log Store" as LogStore
+
+' Relationships
+GraphViewer --> GraphExplorer : View/Edit Graph
+DashboardConfig --> GraphExplorer : Configure Simulation
+GraphExplorer --> GraphStructure : Read/Write Data
+GraphExplorer --> LogStore : Append/Clear Logs
+LogViewer --> LogStore : Read Logs
+@enduml
