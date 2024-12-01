@@ -20,7 +20,6 @@
 		grid-template-columns: 4fr 6fr;
 		grid-template-rows: 100vh;
 		width: 100%;
-		max-height: 98vh;
 		box-sizing: border-box;
 	}
 
@@ -31,20 +30,16 @@
 
 	.left-pane {
 		max-height: 100%;
-		border-right: 2px solid #000;
-		border-left: 2px solid #000;
-		border-top: 2px solid #000;
-		border-bottom: 2px solid #000;
+		border: 2px solid black;
 		padding: 0.5rem 1rem 1rem 1rem;
 	}
 
 	.right-pane {
+		border: 2px solid black;
 		border-left: none;
-		border-right: 2px solid #000;
-		border-top: 2px solid #000;
-		border-bottom: 2px solid #000;
-		display: flex;
-		flex-direction: column;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
 	}
 
 	.right-pane-content {
@@ -61,6 +56,7 @@
 
 	.right-bottom {
 		flex: 0 0 40%;
-		overflow-y: auto;
+		height: 40%;
+		overflow: clip;
 	}
 </style>

@@ -72,7 +72,7 @@
 			{#each logs as log}
 				<div class="log-message {log.type}">
 					<span class="timestamp">[{log.timestamp}]</span>
-					{log.message}
+					<span class="message">{log.message}</span>
 				</div>
 			{/each}
 		</div>
@@ -81,10 +81,13 @@
 
 <style>
 	.logger {
+		display: flex;
+		flex-direction: column;
 		border-top: 2px solid black;
 		padding: 0.5rem 1rem 1rem 1rem;
 		margin: 0;
 		background-color: #fefefe;
+		height: 100%;
 	}
 
 	.header {
@@ -121,7 +124,8 @@
 
 	.log-messages {
 		margin-top: 1rem;
-		max-height: 400px;
+		flex-grow: 1;
+		max-width: 100%;
 		overflow-y: auto;
 		background-color: #fff;
 		padding: 0.5rem;
@@ -129,11 +133,18 @@
 		border-radius: 4px;
 	}
 
+	.message {
+		overflow-wrap: break-word;
+		font-size: 0.9rem;
+		word-break: break-all;
+	}
+
 	.log-message {
 		margin-bottom: 0.5rem;
 		font-family: monospace;
 		display: flex;
 		align-items: center;
+		overflow-wrap: break-word;
 	}
 
 	.log-message::before {
