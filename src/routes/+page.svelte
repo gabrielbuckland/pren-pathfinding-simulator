@@ -1,23 +1,19 @@
 <script>
-	import GraphViewer from '../lib/components/GraphViewer.svelte';
-	import Graph from '../lib/components/Graph.svelte';
+	import Container from '../lib/components/Container.svelte';
 	import Title from '../lib/components/Title.svelte';
 	import VehicleParameters from '../lib/components/VehicleParameters.svelte';
 	import AlgorithmSelection from '../lib/components/AlgorithmSelection.svelte';
 	import SimulatorOptions from '../lib/components/SimulatorOptions.svelte';
-	import Logger from '../lib/components/Logger.svelte';
+	import LogViewer from '../lib/components/LogViewer.svelte';
 	import { nodeStates, edgeStates, executionMode } from '../lib/stores.js';
 	import { resetExplorationStates, generateRandomGraph, getRandomGoalNode } from '../lib/utils';
-	import {
-		fixedNodes,
-		fixedEdges,
-		defaultNodeStates,
-		defaultEdgeStates
-	} from '../lib/graphStructure.js';
+	import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 	import ExecutionOption from '../lib/components/ExecutionOption.svelte';
 	import RunSimulationButton from '../lib/components/RunSimulationButton.svelte';
 	import EndPointSelection from '../lib/components/EndPointSelection.svelte';
 	import NumberOfRunsInput from '../lib/components/NumberOfRunsInput.svelte';
+	import GraphViewer from '../lib/components/GraphViewer.svelte';
+	import DashboardConfig from '../lib/components/DashboardConfig.svelte';
 
 	function resetGraph() {
 		nodeStates.set(defaultNodeStates);
@@ -41,7 +37,7 @@
 	<meta name="description" content="Simulator" />
 </svelte:head>
 
-<GraphViewer>
+<Container>
 	<div slot="left" class="left-pane">
 		<div class="title-reset-container">
 			<Title>Graph</Title>
@@ -51,54 +47,17 @@
 				<button on:click={resetState}>Reset state</button>
 			</div>
 		</div>
-		<Graph />
+		<GraphViewer />
 	</div>
 
 	<div slot="right-top" class="right-top-pane">
-		<Title>Dashboard</Title>
-		<div class="section">
-			<Title>Execution mode:</Title>
-			<ExecutionOption />
-		</div>
-
-		{#if $executionMode === 'interactive'}
-			<div class="section">
-				<Title>Vehicle-Parameters:</Title>
-				<VehicleParameters />
-			</div>
-
-			<div class="section">
-				<Title>Algorithm-Selection:</Title>
-				<AlgorithmSelection />
-			</div>
-			<div class="section">
-				<Title>Simulator-Options:</Title>
-				<SimulatorOptions />
-			</div>
-		{/if}
-
-		{#if $executionMode === 'parameterized'}
-			<div class="section">
-				<Title>Vehicle-Parameters:</Title>
-				<VehicleParameters />
-			</div>
-			<div class="section">
-				<Title>Number of runs:</Title>
-				<NumberOfRunsInput />
-			</div>
-		{/if}
-
-		{#if $executionMode === 'explore'}
-			<div class="section"><EndPointSelection /></div>
-		{/if}
-
-		<RunSimulationButton />
+		<DashboardConfig />
 	</div>
 
 	<div slot="right-bottom" class="right-bottom-pane">
-		<Logger />
+		<LogViewer />
 	</div>
-</GraphViewer>
+</Container>
 
 <style>
 	.left-pane {
@@ -116,20 +75,6 @@
 		padding: 0;
 		margin: 0;
 		height: 100%;
-	}
-
-	.section {
-		padding-block: 1rem;
-	}
-
-	.section:last-child {
-		border-bottom: none;
-	}
-
-	.section :global(h1) {
-		margin-top: 0;
-		margin-bottom: 1rem;
-		font-size: 1.2rem;
 	}
 
 	.title-reset-container {

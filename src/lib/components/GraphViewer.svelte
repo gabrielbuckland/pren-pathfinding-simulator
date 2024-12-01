@@ -1,62 +1,58 @@
-<div class="graph-viewer">
-	<div class="pane left-pane">
-		<slot name="left"></slot>
-	</div>
-	<div class="pane right-pane">
-		<div class="right-pane-content">
-			<div class="right-top">
-				<slot name="right-top"></slot>
-			</div>
-			<div class="right-bottom">
-				<slot name="right-bottom"></slot>
-			</div>
-		</div>
-	</div>
-</div>
+<script>
+	import Edge from './Edge.svelte';
+	import Node from './Node.svelte';
+	import { fixedNodes, fixedEdges } from '../graphStructure.js';
+	import { nodeStates, edgeStates, executionMode } from '../stores.js';
+	import { updateVisibility } from '../utils';
+
+	const nodesById = fixedNodes.reduce((acc, node) => {
+		acc[node.id] = node;
+		return acc;
+	}, {});
+
+	// Reactive block to update visibility when executionMode changes
+	$: updateVisibility($executionMode);
+</script>
+
+<section class="graph">
+	{#if $executionMode === 'interactive' || $executionMode === 'explore'}
+		{#each fixedNodes as node (node.id)}
+			<Node
+				id={node.id}
+				x={node.x}
+				y={node.y}
+				isObstacle={$nodeStates[node.id]?.isObstacle || false}
+				explState={$nodeStates[node.id]?.explState || 'default'}
+				visibility={$nodeStates[node.id]?.visibility || 'visible'}
+			/>
+		{/each}
+
+		{#each fixedEdges as edge (edge.id)}
+			<Edge
+				id={edge.id}
+				from={{ x1: nodesById[edge.from].x, y1: nodesById[edge.from].y }}
+				to={{ x2: nodesById[edge.to].x, y2: nodesById[edge.to].y }}
+				type={$edgeStates[edge.id]?.type || 'solid'}
+				explState={$edgeStates[edge.id]?.explState || 'default'}
+				visibility={$edgeStates[edge.id]?.visibility || 'visible'}
+			/>
+		{/each}
+	{:else if $executionMode === 'parameterized'}
+		<p class="no-visuals-message"><strong>No visuals available in parameterized mode</strong></p>
+	{/if}
+</section>
 
 <style>
-	.graph-viewer {
-		display: grid;
-		grid-template-columns: 4fr 6fr;
-		grid-template-rows: 100vh;
-		width: 100%;
-		box-sizing: border-box;
+	.graph {
+		position: relative;
+		width: 35rem;
+		height: 35rem;
+		margin: auto;
 	}
 
-	.pane {
-		box-sizing: border-box;
-		padding: 0;
-	}
-
-	.left-pane {
-		max-height: 100%;
-		border: 2px solid black;
-		padding: 0.5rem 1rem 1rem 1rem;
-	}
-
-	.right-pane {
-		border: 2px solid black;
-		border-left: none;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-	}
-
-	.right-pane-content {
-		/* flex: 1; */
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-	}
-
-	.right-top {
-		flex: 0 0 60%;
-		overflow-y: auto;
-	}
-
-	.right-bottom {
-		flex: 0 0 40%;
-		height: 40%;
-		overflow: clip;
+	.no-visuals-message {
+		text-align: center;
+		margin-top: 2rem;
+		font-size: 1.2rem;
 	}
 </style>
