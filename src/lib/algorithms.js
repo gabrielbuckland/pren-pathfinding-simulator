@@ -30,18 +30,20 @@ export async function startParameterizedRun(numberOfRounds) {
 
 		const logEntry = {
 			deltaTime: endTime - startTime,
-			graph: {
-				nodes: graph.randomNodes,
-				edges: graph.randomEdges
-			}
+			graphNodes: graph.randomNodes,
+			graphEdges: graph.randomEdges
 		};
 
-		console.log(JSON.stringify(graphExplorer.getTraversedEdges() ?? 'not here'));
-		addLog(JSON.stringify(logEntry), 'info');
+		addLog(`Run #${counter + 1}: ${logEntry.deltaTime}ms`, 'info');
 		log.push(logEntry);
 		counter++;
 	}
-	console.log(log);
+
+	const allTimes = log.map((entry) => entry.deltaTime);
+	const totalTime = allTimes.reduce((a, b) => a + b);
+	addLog(
+		`Parameterized run complete! Total time: ${totalTime}ms, Average Time: ${(totalTime / allTimes.length).toFixed(2)}ms`
+	);
 }
 
 export async function simulateMapExploration() {

@@ -6,6 +6,7 @@
 	import NumberOfRunsInput from './NumberOfRunsInput.svelte';
 	import RunSimulationButton from './RunSimulationButton.svelte';
 	import SimulatorOptions from './SimulatorOptions.svelte';
+	import TimeToExploreEdgesInput from './TimeToExploreEdgesInput.svelte';
 	import Title from './Title.svelte';
 	import VehicleParameters from './VehicleParameters.svelte';
 </script>
@@ -36,6 +37,7 @@
 	<div class="section">
 		<Title>Vehicle-Parameters:</Title>
 		<VehicleParameters />
+		<TimeToExploreEdgesInput />
 	</div>
 	<div class="section">
 		<Title>Number of runs:</Title>

@@ -37,7 +37,8 @@ export class GraphExplorer {
 		};
 		this.nodeStack = [];
 		this.nodeDelay = exMode === 'explore' ? delayInMilliseconds : 0;
-		this.exploreEdgeDelay = exMode === 'explore' ? delayInMilliseconds : 100;
+		this.exploreEdgeDelay =
+			exMode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToExploreEdges;
 		this.solidEdgeTraversalDelay =
 			exMode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToTraverse;
 		this.barrierEdgeTraversalDelay =

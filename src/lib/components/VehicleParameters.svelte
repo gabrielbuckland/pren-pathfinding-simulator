@@ -10,7 +10,11 @@
 	});
 
 	function updateVehicleParameters() {
-		vehicleParameters.set({ timeToTraverse, timeWithBarrier });
+		vehicleParameters.update((params) => ({
+			...params,
+			timeToTraverse,
+			timeWithBarrier
+		}));
 	}
 </script>
 

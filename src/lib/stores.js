@@ -10,7 +10,8 @@ export const edgeStates = writable(defaultEdgeStates);
 // Store for vehicle parameters: { timeToTraverse, timeWithBarrier }
 export const vehicleParameters = writable({
 	timeToTraverse: 1.0,
-	timeWithBarrier: 2.0
+	timeWithBarrier: 2.0,
+	timeToExploreEdges: 100
 });
 
 // Store for selected endpoint (one of 'A', 'B', 'C')
