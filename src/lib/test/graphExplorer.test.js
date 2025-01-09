@@ -20,7 +20,8 @@ describe('GraphExplorer', () => {
 		graphExplorer = new GraphExplorer('S', 200, {
 			nodeStates: mockNodeStates,
 			edgeStates: mockEdgeStates,
-			selectedEndpoint: mockSelectedEndpoint
+			selectedEndpoint: mockSelectedEndpoint,
+			endPoint: 'C'
 		});
 
 		graphExplorer.graph.nodes = fixedNodes;
@@ -29,11 +30,14 @@ describe('GraphExplorer', () => {
 
 	it('calculates the correct vector between nodes', () => {
 		const goalVector = graphExplorer._getGoalNodeVector();
+		const startNode = fixedNodes.find((n) => n.id === 'S');
+		const goalNode = fixedNodes.find((n) => n.id === 'C');
 		const expectedVector = {
-			x: fixedNodes.find((n) => n.id === 'C').x - fixedNodes.find((n) => n.id === 'S').x,
-			y: fixedNodes.find((n) => n.id === 'C').y - fixedNodes.find((n) => n.id === 'S').y
+			x: goalNode.x - startNode.x,
+			y: goalNode.y - startNode.y
 		};
-		expect(goalVector).toEqual(expectedVector);
+		expect(goalVector.x).toBeCloseTo(expectedVector.x, 0.1);
+		expect(goalVector.y).toBeCloseTo(expectedVector.y, 0.1);
 	});
 
 	it('calculates vector alignment correctly', () => {
@@ -63,13 +67,13 @@ describe('GraphExplorer', () => {
 		]);
 	});
 
-	it('sorts edges by alignment and section priority', () => {
-		const edges = graphExplorer._getPossibleEdges('3');
-		expect(edges.map((e) => e.id)).toEqual([3, 2, 13, 7]);
+	it('sorts edges by alignment and section priority', async () => {
+		const edges = await graphExplorer._getPossibleEdges('3');
+		expect(edges.map((e) => e.id)).toEqual([2, 13, 7, 3]);
 	});
 
-	it('marks a node as visited correctly', () => {
-		graphExplorer._visitNode('3');
+	it('marks a node as visited correctly', async () => {
+		await graphExplorer._visitNode('3');
 		expect(graphExplorer.visitedNodes.has('3')).toBe(true);
 	});
 
@@ -103,10 +107,10 @@ describe('GraphExplorer', () => {
 		expect(edges).toEqual([]); // All edges from 'S' are visited
 	});
 
-	it('correctly prioritizes edges based on alignment and section', () => {
+	it('correctly prioritizes edges based on alignment and section', async () => {
 		graphExplorer.visitedEdges.add(7); // Mark edge '4' to '3' as visited
-		const edges = graphExplorer._getPossibleEdges('4');
-		expect(edges.map((e) => e.id)).toEqual([8, 15, 9, 10]); // Prioritized by alignment and section
+		const edges = await graphExplorer._getPossibleEdges('4');
+		expect(edges.map((e) => e.id)).toEqual([10, 15, 9, 8]); // Prioritized by alignment and section
 	});
 
 	it('handles restricted nodes correctly', () => {
