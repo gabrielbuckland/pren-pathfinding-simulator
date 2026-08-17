@@ -7,10 +7,13 @@
 	import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 	import GraphViewer from '../lib/components/GraphViewer.svelte';
 	import DashboardViewer from '../lib/components/DashboardViewer.svelte';
+	import Legend from '../lib/components/Legend.svelte';
+	import { executionMode } from '../lib/stores.js';
 
 	function resetGraph() {
-		nodeStates.set(defaultNodeStates);
-		edgeStates.set(defaultEdgeStates);
+		// Clone, so the shared defaults never end up in the store by reference.
+		nodeStates.set(structuredClone(defaultNodeStates));
+		edgeStates.set(structuredClone(defaultEdgeStates));
 	}
 
 	function resetState() {
@@ -40,7 +43,12 @@
 				<button on:click={resetState}>Reset state</button>
 			</div>
 		</div>
-		<GraphViewer />
+		<div class="graph-area">
+			<GraphViewer />
+			{#if $executionMode !== 'parameterized'}
+				<Legend />
+			{/if}
+		</div>
 	</div>
 
 	<div slot="right-top" class="right-top-pane">
@@ -57,6 +65,11 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+	}
+
+	/* Keeps the legend attached to the graph instead of the bottom of the pane. */
+	.graph-area {
+		margin: auto;
 	}
 
 	.right-top-pane {

@@ -1,5 +1,4 @@
 import { nodeStates, edgeStates } from './stores.js';
-import { get } from 'svelte/store';
 import { fixedNodes, fixedEdges } from './graphStructure.js';
 
 export function resetExplorationStates() {
@@ -26,32 +25,42 @@ export function resetExplorationStates() {
 	});
 }
 
-// Helper function to set visibility based on mode
+// Edges leaving the start node 'S' — the only ones visible when exploration begins.
+const START_EDGE_IDS = [1, 2, 14];
+
+/**
+ * Sets node and edge visibility for the given execution mode.
+ *
+ * Builds new state objects rather than writing in place: resetGraph() puts the
+ * shared default objects into the stores by reference, so an in-place write
+ * would permanently corrupt those defaults.
+ */
 export function updateVisibility(mode) {
 	nodeStates.update((states) => {
-		fixedNodes.forEach((node) => {
-			const isVisible = mode === 'interactive' || (mode === 'explore' && ['S'].includes(node.id));
-			states[node.id] = {
-				...(states[node.id] || {}),
+		const newStates = { ...states };
+		for (const node of fixedNodes) {
+			const isVisible = mode === 'interactive' || (mode === 'explore' && node.id === 'S');
+			newStates[node.id] = {
+				...(newStates[node.id] || {}),
 				visibility: isVisible ? 'visible' : 'hidden'
 			};
-		});
-		return states;
+		}
+		return newStates;
 	});
 
 	edgeStates.update((states) => {
-		fixedEdges.forEach((edge) => {
-			let isVisible =
-				mode === 'interactive' || (mode === 'explore' && [1, 2, 14].includes(edge.id));
-			if (get(edgeStates)[edge.id]?.type === 'dashed' && mode === 'explore') {
-				isVisible = false;
-			}
-			states[edge.id] = {
-				...(states[edge.id] || {}),
+		const newStates = { ...states };
+		for (const edge of fixedEdges) {
+			const isStartEdge = START_EDGE_IDS.includes(edge.id);
+			const isMissing = newStates[edge.id]?.type === 'dashed';
+			const isVisible = mode === 'interactive' || (mode === 'explore' && isStartEdge && !isMissing);
+
+			newStates[edge.id] = {
+				...(newStates[edge.id] || {}),
 				visibility: isVisible ? 'visible' : 'hidden'
 			};
-		});
-		return states;
+		}
+		return newStates;
 	});
 }
 
