@@ -21,18 +21,18 @@
 </div>
 
 <style>
-	label {
-		margin-bottom: 1rem;
-	}
-
 	.endpoint-selection {
-		margin-bottom: 1rem;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-width: 0;
 	}
 
 	.radio-buttons {
 		display: flex;
 		gap: 1rem;
 		margin-top: 0.5rem;
+		padding: 0.5rem 0;
 	}
 
 	.radio-buttons label {
@@ -41,6 +41,6 @@
 	}
 
 	.radio-buttons input[type='radio'] {
-		margin-right: 0.5rem;
+		margin-right: 0.4rem;
 	}
 </style>

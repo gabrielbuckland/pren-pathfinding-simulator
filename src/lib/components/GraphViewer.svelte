@@ -10,11 +10,13 @@
 		return acc;
 	}, {});
 
-	// Only the exploring vehicle starts without a map, so only it gets the
-	// partially hidden graph. Everything else is shown what it actually knows.
-	$: updateVisibility(
-		$executionMode === 'single' && $selectedAlgorithm === 'Exploration' ? 'start-only' : 'all'
-	);
+	// Only the exploring vehicle drives without a map, and it hides the graph
+	// itself when its run starts. Every other algorithm is handed the map, so
+	// selecting one restores the full view. Selecting Exploration leaves the
+	// map alone: you still need to see it while laying out the scenario.
+	$: if ($selectedAlgorithm !== 'Exploration' || $executionMode !== 'single') {
+		updateVisibility('all');
+	}
 </script>
 
 <section class="graph">

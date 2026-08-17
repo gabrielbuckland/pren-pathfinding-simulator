@@ -1,55 +1,38 @@
 <script>
 	import { vehicleParameters } from '../stores.js';
 
-	let timeToTraverse;
-	let timeWithBarrier;
+	// All three feed both run modes, so they belong in one row rather than
+	// split across sections.
+	const fields = [
+		{ key: 'timeToTraverse', label: 'Traverse edge' },
+		{ key: 'timeWithBarrier', label: 'Traverse with barrier' },
+		{ key: 'timeToExploreEdges', label: 'Scan edge' }
+	];
 
-	vehicleParameters.subscribe((params) => {
-		timeToTraverse = params.timeToTraverse;
-		timeWithBarrier = params.timeWithBarrier;
-	});
-
-	function updateVehicleParameters() {
-		vehicleParameters.update((params) => ({
-			...params,
-			timeToTraverse,
-			timeWithBarrier
-		}));
+	function update(key, value) {
+		const parsed = Number(value);
+		if (Number.isNaN(parsed) || parsed < 0) return;
+		vehicleParameters.update((params) => ({ ...params, [key]: parsed }));
 	}
 </script>
 
-<div class="vehicle-parameters">
-	<div class="row">
+<div class="row">
+	{#each fields as field}
 		<label>
-			Time to traverse edge (time units):
+			{field.label}
 			<input
 				type="number"
 				min="0"
 				step="0.1"
-				bind:value={timeToTraverse}
-				on:input={updateVehicleParameters}
+				value={$vehicleParameters[field.key]}
+				on:input={(event) => update(field.key, event.currentTarget.value)}
 			/>
 		</label>
-
-		<label>
-			Time to traverse edge with barrier (time units):
-			<input
-				type="number"
-				min="0"
-				step="0.1"
-				bind:value={timeWithBarrier}
-				on:input={updateVehicleParameters}
-			/>
-		</label>
-	</div>
+	{/each}
 </div>
+<p class="unit-note">All values in time units.</p>
 
 <style>
-	.vehicle-parameters {
-		display: flex;
-		flex-direction: column;
-	}
-
 	.row {
 		display: flex;
 		width: 100%;
@@ -58,12 +41,19 @@
 
 	label {
 		flex: 1;
-		margin-bottom: 1rem;
+		min-width: 0;
 	}
 
 	input[type='number'] {
 		width: 100%;
 		padding: 0.5rem;
 		box-sizing: border-box;
+		margin-top: 0.25rem;
+	}
+
+	.unit-note {
+		margin: 0.5rem 0 0 0;
+		font-size: 0.85rem;
+		color: #666;
 	}
 </style>

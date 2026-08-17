@@ -16,15 +16,14 @@
 	.algorithm-selection {
 		display: flex;
 		flex-direction: column;
-	}
-
-	label {
-		margin-bottom: 0.5rem;
+		flex: 1;
+		min-width: 0;
 	}
 
 	select {
 		width: 100%;
 		padding: 0.5rem;
 		box-sizing: border-box;
+		margin-top: 0.25rem;
 	}
 </style>
