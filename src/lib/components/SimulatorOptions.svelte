@@ -5,11 +5,11 @@
 </script>
 
 <div class="row">
-	<AlgorithmSelection />
 	<EndPointSelection />
+	<AlgorithmSelection />
 
 	<label>
-		Animation speed (ms):
+		Animation speed (ms)
 		<input type="number" min="0" step="50" bind:value={$animationSpeed} />
 	</label>
 </div>

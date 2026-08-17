@@ -1,7 +1,7 @@
 <script>
 	import { numberOfRuns } from '../stores';
 
-	let label = 'Number of runs:';
+	let label = 'Number of runs';
 	let min = 1;
 	let step = 1;
 	let number = 10;

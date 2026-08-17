@@ -8,41 +8,54 @@
 	import VehicleParameters from './VehicleParameters.svelte';
 </script>
 
-<Title>Dashboard</Title>
+<div class="dashboard">
+	<Title>Dashboard</Title>
 
-<div class="section">
-	<Title>Execution mode:</Title>
-	<ExecutionOption />
+	<div class="section">
+		<Title>Execution mode</Title>
+		<ExecutionOption />
+	</div>
+
+	<div class="section">
+		<Title>Vehicle parameters</Title>
+		<VehicleParameters />
+	</div>
+
+	<div class="section">
+		<Title>Simulator options</Title>
+		{#if $executionMode === 'single'}
+			<SimulatorOptions />
+		{:else}
+			<NumberOfRunsInput />
+		{/if}
+	</div>
+
+	<!-- Pushed to the bottom edge of the pane, so it stays in the same place
+	     regardless of how many options the selected mode shows. -->
+	<div class="run-action">
+		<RunSimulationButton />
+	</div>
 </div>
-
-<div class="section">
-	<Title>Vehicle-Parameters:</Title>
-	<VehicleParameters />
-</div>
-
-<div class="section">
-	<Title>Simulator-Options:</Title>
-	{#if $executionMode === 'single'}
-		<SimulatorOptions />
-	{:else}
-		<NumberOfRunsInput />
-	{/if}
-</div>
-
-<RunSimulationButton />
 
 <style>
-	.section {
-		padding-block: 1rem;
+	.dashboard {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 	}
 
-	.section:last-child {
-		border-bottom: none;
+	.section {
+		padding-block: 1rem;
 	}
 
 	.section :global(h1) {
 		margin-top: 0;
 		margin-bottom: 1rem;
 		font-size: 1.2rem;
+	}
+
+	.run-action {
+		margin-top: auto;
+		padding-top: 1rem;
 	}
 </style>

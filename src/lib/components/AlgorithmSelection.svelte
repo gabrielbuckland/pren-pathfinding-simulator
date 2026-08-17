@@ -4,7 +4,7 @@
 </script>
 
 <div class="algorithm-selection">
-	<label for="algorithm-select">Algorithm to apply:</label>
+	<label for="algorithm-select">Algorithm</label>
 	<select id="algorithm-select" bind:value={$selectedAlgorithm}>
 		{#each algorithms as algorithm}
 			<option value={algorithm}>{algorithm}</option>

@@ -76,7 +76,9 @@
 		margin: auto;
 	}
 
+	/* Definite height so the dashboard can push its run button to the bottom. */
 	.right-top-pane {
+		height: 100%;
 		padding: 0.5rem 1rem 1rem 1rem;
 		margin: 0;
 	}
