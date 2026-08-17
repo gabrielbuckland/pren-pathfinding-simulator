@@ -16,40 +16,28 @@ const addCustomLog = function (message, level) {
 };
 
 export class GraphExplorer {
-	constructor(
-		startNodeId = 'S',
-		delayInMilliseconds = 200,
-		{ nodeStates, edgeStates, exMode, endPoint } = {
-			exMode: get(executionMode)
-		}
-	) {
+	constructor(startNodeId = 'S', delayInMilliseconds = 200, { exMode, endPoint } = {}) {
+		const mode = exMode ?? get(executionMode);
+
 		this.startNodeId = startNodeId;
 		this.goalNodeId = endPoint ?? get(selectedEndpoint);
 		this.visitedNodes = new Set();
 		this.visitedEdges = new Set();
 		this.intraversibleEdges = new Set();
-		this.edgeLengths = { ...edgeStates };
-		this.nodeStates = { ...nodeStates };
-		this.nodeVisibility = {};
 		this.graph = {
 			nodes: fixedNodes,
 			edges: fixedEdges
 		};
 		this.nodeStack = [];
-		this.nodeDelay = exMode === 'explore' ? delayInMilliseconds : 0;
+		this.nodeDelay = mode === 'explore' ? delayInMilliseconds : 0;
 		this.exploreEdgeDelay =
-			exMode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToExploreEdges;
+			mode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToExploreEdges;
 		this.solidEdgeTraversalDelay =
-			exMode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToTraverse;
+			mode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToTraverse;
 		this.barrierEdgeTraversalDelay =
-			exMode === 'explore' ? delayInMilliseconds * 3 : get(vehicleParameters).timeWithBarrier;
-		this.vectorToGoal = this._getGoalNodeVector();
-		this.targetSection = this._getNodeSection(
-			this.graph.nodes.find((n) => n.id === this.goalNodeId)
-		);
+			mode === 'explore' ? delayInMilliseconds * 3 : get(vehicleParameters).timeWithBarrier;
 		this.goalReached = false;
-		this.traversedEdges = [];
-		this.exMode = exMode;
+		this.exMode = mode;
 	}
 
 	async explore() {
@@ -165,8 +153,7 @@ export class GraphExplorer {
 			(e) =>
 				!this.visitedEdges.has(e.id) &&
 				!this.intraversibleEdges.has(e.id) &&
-				get(edgeStates)[e.id]?.type !== 'dashed' &&
-				get(edgeStates)[e.id]?.type !== 'restricted'
+				get(edgeStates)[e.id]?.type !== 'dashed'
 		);
 
 		possibleEdges.sort((edgeA, edgeB) => {
@@ -292,26 +279,12 @@ export class GraphExplorer {
 		this._checkIntersections(edge);
 	}
 
-	_handleConeDetection(nodeAtIntersection) {
-		this._updateNodeState(nodeAtIntersection.id, {
-			explState: 'restricted',
-			visibility: 'visible'
-		});
-		this.visitedEdges
-			.filter((e) => e.from === nodeAtIntersection.id || e.to === nodeAtIntersection.id)
-			.forEach((e) => {
-				this._setEdgeIntraversable(e.id);
-			});
-	}
-
 	async _markEdgeAsTraversed(edgeId) {
 		await delay(
 			get(edgeStates)[edgeId]?.type === 'barrier'
 				? this.barrierEdgeTraversalDelay
 				: this.solidEdgeTraversalDelay
 		);
-		const edge = this.graph.edges.find((e) => e.id === edgeId);
-		this.traversedEdges.push({ from: edge.from, to: edge.to });
 		this._updateEdgeState(edgeId, { explState: 'visited', visibility: 'visible' });
 	}
 
@@ -369,10 +342,6 @@ export class GraphExplorer {
 				}
 			};
 		});
-	}
-
-	_getRandomElementFromList(list) {
-		return list[Math.floor(Math.random() * list.length)];
 	}
 
 	// Helper function to calculate the orientation of ordered triplet (p, q, r)
@@ -495,9 +464,5 @@ export class GraphExplorer {
 
 	hasReachedGoal() {
 		return this.goalReached;
-	}
-
-	getTraversedEdges() {
-		return this.traversedEdges;
 	}
 }

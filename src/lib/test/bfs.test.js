@@ -52,7 +52,7 @@ describe('BFS', () => {
 		expect(finished(edgeStates).length).toBeGreaterThan(0);
 	});
 
-	it('reports failure when the goal is walled off', async () => {
+	it('explains why the goal is unreachable instead of only that it is', async () => {
 		edgeStates.update((states) => {
 			const next = { ...states };
 			for (const id of [3, 4, 8]) next[id] = { ...next[id], type: 'dashed' };
@@ -62,6 +62,24 @@ describe('BFS', () => {
 		await runAlgorithm('BFS', 'S', 'C', vehicleParams, 0);
 
 		const messages = get(algorithmLogs).map((entry) => entry.message);
-		expect(messages.some((text) => text.includes('not reachable'))).toBe(true);
+		expect(messages.some((text) => text.includes('too many sections have been removed'))).toBe(
+			true
+		);
+	});
+
+	it('names the pylon that cuts the goal off', async () => {
+		// Node 2 is the only junction linking the start to the rest of the map
+		// once these edges are gone, so a pylon there disconnects goal A.
+		edgeStates.update((states) => {
+			const next = { ...states };
+			for (const id of [1, 3, 7, 8, 11]) next[id] = { ...next[id], type: 'dashed' };
+			return next;
+		});
+		nodeStates.update((states) => ({ ...states, 2: { ...states[2], isObstacle: true } }));
+
+		await runAlgorithm('BFS', 'S', 'A', vehicleParams, 0);
+
+		const messages = get(algorithmLogs).map((entry) => entry.message);
+		expect(messages.some((text) => text.includes('removing the pylon on node 2'))).toBe(true);
 	});
 });

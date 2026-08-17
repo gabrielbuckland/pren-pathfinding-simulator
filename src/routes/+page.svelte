@@ -2,7 +2,7 @@
 	import Container from '../lib/components/Container.svelte';
 	import Title from '../lib/components/Title.svelte';
 	import LogViewer from '../lib/components/LogViewer.svelte';
-	import { nodeStates, edgeStates } from '../lib/stores.js';
+	import { nodeStates, edgeStates, selectedEndpoint } from '../lib/stores.js';
 	import { resetExplorationStates, generateRandomGraph, getRandomGoalNode } from '../lib/utils';
 	import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 	import GraphViewer from '../lib/components/GraphViewer.svelte';
@@ -21,10 +21,15 @@
 	}
 
 	function randomizeGraph() {
-		const randomNodeId = getRandomGoalNode();
-		const { randomNodes, randomEdges } = generateRandomGraph(randomNodeId);
+		const goalNodeId = getRandomGoalNode();
+		const { randomNodes, randomEdges } = generateRandomGraph(goalNodeId);
 		nodeStates.set(randomNodes);
 		edgeStates.set(randomEdges);
+
+		// The generated map only guarantees a route to this goal, so select it.
+		// Leaving the previous endpoint selected would let the user run against a
+		// target the map has no route to.
+		selectedEndpoint.set(goalNodeId);
 	}
 </script>
 

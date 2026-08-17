@@ -21,7 +21,7 @@
 <div class="vehicle-parameters">
 	<div class="row">
 		<label>
-			Time to traverse edge (cm/s):
+			Time to traverse edge (time units):
 			<input
 				type="number"
 				min="0"
@@ -32,7 +32,7 @@
 		</label>
 
 		<label>
-			Time to traverse edge with barrier (cm/s):
+			Time to traverse edge with barrier (time units):
 			<input
 				type="number"
 				min="0"

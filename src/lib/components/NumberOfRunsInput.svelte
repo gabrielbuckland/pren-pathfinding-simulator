@@ -1,9 +1,9 @@
 <script>
 	import { numberOfRuns } from '../stores';
 
-	let label = '';
-	let min = 10;
-	let step = 10;
+	let label = 'Number of runs:';
+	let min = 1;
+	let step = 1;
 	let number = 10;
 
 	function updateNumber() {

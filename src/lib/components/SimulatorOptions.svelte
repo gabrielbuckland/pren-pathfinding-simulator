@@ -1,33 +1,14 @@
 <script>
-	import { animationSpeed, executionMode } from '../stores.js';
-	import { get } from 'svelte/store';
+	import { animationSpeed } from '../stores.js';
 	import EndPointSelection from './EndPointSelection.svelte';
-
-	let numGraphs = 1;
-	let selectedOption = get(executionMode);
 </script>
 
 <div class="simulator-options">
-	<label>
-		Number of graphs to test:
-		<input
-			type="number"
-			min="1"
-			disabled={selectedOption === 'interactive'}
-			bind:value={numGraphs}
-		/>
-	</label>
-
 	<EndPointSelection />
 
 	<label>
 		Animation speed (ms):
-		<input
-			type="number"
-			min="0"
-			disabled={selectedOption === 'parameterized'}
-			bind:value={$animationSpeed}
-		/>
+		<input type="number" min="0" bind:value={$animationSpeed} />
 	</label>
 </div>
 

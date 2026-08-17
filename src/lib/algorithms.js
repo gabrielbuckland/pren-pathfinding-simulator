@@ -1,6 +1,7 @@
+import { get } from 'svelte/store';
 import { nodeStates, edgeStates, algorithmLogs } from './stores.js';
 import { addLog } from './logging.js';
-import { generateRandomGraph, getRandomGoalNode } from './utils.js';
+import { generateRandomGraph, getRandomGoalNode, isReachable } from './utils.js';
 import { runAStar } from './algorithms/aStar.js';
 import { runBfs } from './algorithms/bfs.js';
 import { runDStarLite } from './algorithms/dStarLite.js';
@@ -99,7 +100,43 @@ export async function runAlgorithm(
 	}
 
 	addLog(`Starting ${algorithmName} from ${startNodeId} to ${endpoint}`, 'info');
+
+	if (!isReachable(get(nodeStates), get(edgeStates), startNodeId, endpoint)) {
+		addLog(explainUnreachable(startNodeId, endpoint), 'error');
+		return;
+	}
+
 	await algorithm(startNodeId, endpoint, vehicleParams, animationMs);
+}
+
+/**
+ * Says why the goal cannot be reached, rather than only that it cannot.
+ * A bare "no path found" reads like an algorithm failure when it is really
+ * a property of the map the user drew.
+ */
+function explainUnreachable(startNodeId, endpoint) {
+	const nodes = get(nodeStates);
+
+	if (nodes[endpoint]?.isObstacle) {
+		return `No route from ${startNodeId} to ${endpoint}: node ${endpoint} is blocked by a pylon.`;
+	}
+
+	// Which nodes would open the map up again if their pylon were removed?
+	const culprits = Object.entries(nodes)
+		.filter(([, state]) => state.isObstacle)
+		.map(([id]) => id)
+		.filter((id) => {
+			const without = { ...nodes, [id]: { ...nodes[id], isObstacle: false } };
+			return isReachable(without, get(edgeStates), startNodeId, endpoint);
+		});
+
+	if (culprits.length > 0) {
+		const list = culprits.join(', ');
+		const noun = culprits.length === 1 ? 'the pylon on node' : 'a pylon on one of nodes';
+		return `No route from ${startNodeId} to ${endpoint}: removing ${noun} ${list} would reconnect it.`;
+	}
+
+	return `No route from ${startNodeId} to ${endpoint}: too many sections have been removed. Restore an edge or press "Randomized graph".`;
 }
 
 async function exploreMap() {

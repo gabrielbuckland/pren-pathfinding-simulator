@@ -168,22 +168,17 @@ export function generateRandomGraph(randomNodeId = 'A') {
 
 	fixedEdges.forEach((edge) => {
 		let type = 'solid';
-		let traversable = true;
 
-		if (pathEdgeIds.has(edge.id)) {
-			// Edges in the path remain solid and traversable
-			type = 'solid';
-		} else if (edgesToChangeIds.includes(edge.id)) {
-			// Randomly assign 'dashed' or 'barrier' to non-path edges
+		if (!pathEdgeIds.has(edge.id) && edgesToChangeIds.includes(edge.id)) {
+			// Non-path edges may be removed or carry a barrier. Path edges stay
+			// clear, which is what guarantees a route to the goal.
 			type = Math.random() < 0.5 ? 'dashed' : 'barrier';
-			traversable = type !== 'barrier';
 		}
 
 		randomEdges[edge.id] = {
 			type,
 			explState: 'default',
-			visibility: 'visible',
-			traversable
+			visibility: 'visible'
 		};
 	});
 
@@ -193,56 +188,50 @@ export function generateRandomGraph(randomNodeId = 'A') {
 	).length;
 
 	if (nonSolidEdgeCount > maxNonSolidEdges) {
-		// If the count exceeds the limit, regenerate the graph
-		return generateRandomGraph();
+		// If the count exceeds the limit, regenerate for the same goal
+		return generateRandomGraph(randomNodeId);
 	}
 
 	// Step 6: Ensure that the path from 'S' to the selected end node is valid
-	if (!hasValidPath(randomNodes, randomEdges, 'S', randomNodeId)) {
-		// If the path is invalid due to obstacles, regenerate the graph
-		return generateRandomGraph();
+	if (!isReachable(randomNodes, randomEdges, 'S', randomNodeId)) {
+		// If the path is invalid due to obstacles, regenerate for the same goal
+		return generateRandomGraph(randomNodeId);
 	}
 
 	return { randomNodes, randomEdges };
 }
 
-// Function to check if a valid path exists between two nodes
-function hasValidPath(randomNodes, randomEdges, startNodeId, endNodeId) {
-	const adjacencyList = {};
-	Object.keys(randomNodes).forEach((nodeId) => {
-		adjacencyList[nodeId] = [];
-	});
+/**
+ * Whether `goalNodeId` can be driven to from `startNodeId`.
+ *
+ * Uses the same rules as every algorithm in the simulator: a removed edge
+ * ('dashed') blocks the way, a node carrying a pylon blocks the way, and a
+ * barrier does not. It only costs more time.
+ */
+export function isReachable(nodes, edges, startNodeId, goalNodeId) {
+	if (nodes[startNodeId]?.isObstacle || nodes[goalNodeId]?.isObstacle) return false;
 
-	fixedEdges.forEach((edge) => {
-		const edgeState = randomEdges[edge.id];
-		if (edgeState.traversable) {
-			const fromNodeState = randomNodes[edge.from];
-			const toNodeState = randomNodes[edge.to];
+	const adjacency = {};
+	for (const node of fixedNodes) adjacency[node.id] = [];
 
-			if (!fromNodeState.isObstacle && !toNodeState.isObstacle) {
-				adjacencyList[edge.from].push(edge.to);
-				adjacencyList[edge.to].push(edge.from);
-			}
-		}
-	});
+	for (const edge of fixedEdges) {
+		if (edges[edge.id]?.type === 'dashed') continue;
+		if (nodes[edge.from]?.isObstacle || nodes[edge.to]?.isObstacle) continue;
+		adjacency[edge.from].push(edge.to);
+		adjacency[edge.to].push(edge.from);
+	}
 
-	const visited = new Set();
+	const seen = new Set([startNodeId]);
 	const queue = [startNodeId];
-	visited.add(startNodeId);
-
 	while (queue.length > 0) {
-		const currentNode = queue.shift();
-
-		if (currentNode === endNodeId) {
-			return true;
-		}
-
-		adjacencyList[currentNode].forEach((neighbor) => {
-			if (!visited.has(neighbor)) {
-				visited.add(neighbor);
+		const current = queue.shift();
+		if (current === goalNodeId) return true;
+		for (const neighbor of adjacency[current]) {
+			if (!seen.has(neighbor)) {
+				seen.add(neighbor);
 				queue.push(neighbor);
 			}
-		});
+		}
 	}
 
 	return false;
