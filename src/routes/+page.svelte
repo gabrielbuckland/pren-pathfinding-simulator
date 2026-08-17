@@ -49,7 +49,7 @@
 		</p>
 		<div class="graph-area">
 			<GraphViewer />
-			{#if $executionMode !== 'parameterized'}
+			{#if $executionMode === 'single'}
 				<Legend />
 			{/if}
 		</div>

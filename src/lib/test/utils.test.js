@@ -17,14 +17,14 @@ describe('updateVisibility', () => {
 		nodeStates.set(defaultNodeStates);
 		edgeStates.set(defaultEdgeStates);
 
-		updateVisibility('explore');
+		updateVisibility('start-only');
 
 		expect(defaultNodeStates.A.visibility).toBe('visible');
 		expect(defaultEdgeStates[5].visibility).toBe('visible');
 	});
 
-	it('hides everything but the start node and its edges in explore mode', () => {
-		updateVisibility('explore');
+	it('hides everything but the start node and its edges when revealing', () => {
+		updateVisibility('start-only');
 
 		expect(get(nodeStates).S.visibility).toBe('visible');
 		expect(get(nodeStates).A.visibility).toBe('hidden');
@@ -32,9 +32,9 @@ describe('updateVisibility', () => {
 		expect(get(edgeStates)[5].visibility).toBe('hidden');
 	});
 
-	it('shows everything in interactive mode', () => {
-		updateVisibility('explore');
-		updateVisibility('interactive');
+	it('shows the whole map again afterwards', () => {
+		updateVisibility('start-only');
+		updateVisibility('all');
 
 		expect(get(nodeStates).A.visibility).toBe('visible');
 		expect(get(edgeStates)[5].visibility).toBe('visible');
@@ -42,7 +42,7 @@ describe('updateVisibility', () => {
 
 	it('produces a new state object so subscribers are notified', () => {
 		const before = get(nodeStates);
-		updateVisibility('explore');
+		updateVisibility('start-only');
 
 		expect(get(nodeStates)).not.toBe(before);
 	});

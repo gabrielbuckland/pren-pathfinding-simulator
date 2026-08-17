@@ -1,6 +1,6 @@
 <script>
 	import { selectedAlgorithm } from '../stores.js';
-	let algorithms = ['Dijkstra', 'A*', 'D*Lite', 'BFS'];
+	let algorithms = ['Exploration', 'Dijkstra', 'A*', 'D*Lite', 'BFS'];
 </script>
 
 <div class="algorithm-selection">

@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
-import { nodeStates, edgeStates, algorithmLogs } from './stores.js';
+import { nodeStates, edgeStates, algorithmLogs, vehicleParameters } from './stores.js';
 import { addLog } from './logging.js';
-import { generateRandomGraph, getRandomGoalNode, isReachable } from './utils.js';
+import { generateRandomGraph, getRandomGoalNode, isReachable, updateVisibility } from './utils.js';
 import { runAStar } from './algorithms/aStar.js';
 import { runBfs } from './algorithms/bfs.js';
 import { runDStarLite } from './algorithms/dStarLite.js';
@@ -34,28 +34,27 @@ export async function startParameterizedRun(numberOfRounds) {
 		nodeStates.set(graph.randomNodes);
 		edgeStates.set(graph.randomEdges);
 
-		const graphExplorer = new GraphExplorer('S', 100, {
-			exMode: 'parameterized',
-			endPoint: randomGoalNode
+		const graphExplorer = new GraphExplorer('S', 0, {
+			endPoint: randomGoalNode,
+			vehicleParams: get(vehicleParameters),
+			quiet: true
 		});
 
-		const startTime = Date.now();
 		await graphExplorer.explore();
-		const endTime = Date.now();
 
 		if (!graphExplorer.hasReachedGoal()) {
 			continue;
 		}
 
 		const logEntry = {
-			deltaTime: endTime - startTime,
+			deltaTime: graphExplorer.getSimulatedTime(),
 			goalNode: randomGoalNode,
 			graphNodes: graph.randomNodes,
 			graphEdges: graph.randomEdges
 		};
 
 		log.push(logEntry);
-		addLog(`Run #${log.length} (goal ${randomGoalNode}): ${logEntry.deltaTime}ms`, 'info');
+		addLog(`Run #${log.length} (goal ${randomGoalNode}): ${logEntry.deltaTime} units`, 'info');
 	}
 
 	if (log.length === 0) {
@@ -65,16 +64,11 @@ export async function startParameterizedRun(numberOfRounds) {
 
 	const totalTime = log.reduce((sum, entry) => sum + entry.deltaTime, 0);
 	addLog(
-		`Parameterized run complete! ${log.length} runs, total time: ${totalTime}ms, average: ${(
+		`Bulk run complete! ${log.length} runs, total time: ${totalTime} units, average: ${(
 			totalTime / log.length
-		).toFixed(2)}ms`,
+		).toFixed(2)} units`,
 		'success'
 	);
-}
-
-export async function simulateMapExploration() {
-	algorithmLogs.set([]);
-	await exploreMap();
 }
 
 export async function runAlgorithm(
@@ -87,6 +81,7 @@ export async function runAlgorithm(
 	algorithmLogs.set([]);
 
 	const algorithms = {
+		Exploration: runExploration,
 		Dijkstra: runDijkstra,
 		'A*': runAStar,
 		'D*Lite': runDStarLite,
@@ -139,7 +134,24 @@ function explainUnreachable(startNodeId, endpoint) {
 	return `No route from ${startNodeId} to ${endpoint}: too many sections have been removed. Restore an edge or press "Randomized graph".`;
 }
 
-async function exploreMap() {
-	const graphExplorer = new GraphExplorer('S', 200);
-	await graphExplorer.explore();
+/**
+ * The exploring vehicle, run like any other algorithm.
+ *
+ * It is the only one that does not start with a map, so the graph is hidden
+ * down to the start node and uncovered as it drives. The others are shown the
+ * whole map because they are given it.
+ */
+async function runExploration(startNodeId, goalNodeId, vehicleParams, animationMs) {
+	updateVisibility('start-only');
+
+	const explorer = new GraphExplorer(startNodeId, animationMs, {
+		endPoint: goalNodeId,
+		vehicleParams
+	});
+	await explorer.explore();
+
+	if (explorer.hasReachedGoal()) {
+		addLog(`Reached goal node ${goalNodeId}`, 'success');
+		addLog(`Total traversal time: ${explorer.getSimulatedTime()} units`, 'success');
+	}
 }

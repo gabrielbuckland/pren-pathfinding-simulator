@@ -18,10 +18,10 @@ export const vehicleParameters = writable({
 export const selectedEndpoint = writable('A');
 
 // Store for selectedAlgorithm
-export const selectedAlgorithm = writable('BFS');
+export const selectedAlgorithm = writable('Exploration');
 
-// Store execution mode (either 'interactive' or 'parameterized')
-export const executionMode = writable('interactive');
+// Store execution mode (either 'single' or 'bulk')
+export const executionMode = writable('single');
 
 // New store for animation speed (in milliseconds)
 export const animationSpeed = writable(250);

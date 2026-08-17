@@ -2,7 +2,7 @@
 	import Edge from './Edge.svelte';
 	import Node from './Node.svelte';
 	import { fixedNodes, fixedEdges } from '../graphStructure.js';
-	import { nodeStates, edgeStates, executionMode } from '../stores.js';
+	import { nodeStates, edgeStates, executionMode, selectedAlgorithm } from '../stores.js';
 	import { updateVisibility } from '../utils';
 
 	const nodesById = fixedNodes.reduce((acc, node) => {
@@ -10,12 +10,15 @@
 		return acc;
 	}, {});
 
-	// Reactive block to update visibility when executionMode changes
-	$: updateVisibility($executionMode);
+	// Only the exploring vehicle starts without a map, so only it gets the
+	// partially hidden graph. Everything else is shown what it actually knows.
+	$: updateVisibility(
+		$executionMode === 'single' && $selectedAlgorithm === 'Exploration' ? 'start-only' : 'all'
+	);
 </script>
 
 <section class="graph">
-	{#if $executionMode === 'interactive' || $executionMode === 'explore'}
+	{#if $executionMode === 'single'}
 		{#each fixedNodes as node (node.id)}
 			<Node
 				id={node.id}
@@ -37,8 +40,10 @@
 				visibility={$edgeStates[edge.id]?.visibility || 'visible'}
 			/>
 		{/each}
-	{:else if $executionMode === 'parameterized'}
-		<p class="no-visuals-message"><strong>No visuals available in parameterized mode</strong></p>
+	{:else}
+		<p class="no-visuals-message">
+			<strong>No visuals in a bulk run. Results appear in the log.</strong>
+		</p>
 	{/if}
 </section>
 

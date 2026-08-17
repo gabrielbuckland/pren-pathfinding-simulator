@@ -1,7 +1,6 @@
 <script>
 	import { executionMode } from '../stores';
 	import AlgorithmSelection from './AlgorithmSelection.svelte';
-	import EndPointSelection from './EndPointSelection.svelte';
 	import ExecutionOption from './ExecutionOption.svelte';
 	import NumberOfRunsInput from './NumberOfRunsInput.svelte';
 	import RunSimulationButton from './RunSimulationButton.svelte';
@@ -17,12 +16,15 @@
 	<ExecutionOption />
 </div>
 
-{#if $executionMode === 'interactive'}
-	<div class="section">
-		<Title>Vehicle-Parameters:</Title>
-		<VehicleParameters />
-	</div>
+<!-- All three timings feed both modes now that Exploration is an algorithm,
+     so they are configured in one place instead of per mode. -->
+<div class="section">
+	<Title>Vehicle-Parameters:</Title>
+	<VehicleParameters />
+	<TimeToExploreEdgesInput />
+</div>
 
+{#if $executionMode === 'single'}
 	<div class="section">
 		<Title>Algorithm-Selection:</Title>
 		<AlgorithmSelection />
@@ -31,22 +33,11 @@
 		<Title>Simulator-Options:</Title>
 		<SimulatorOptions />
 	</div>
-{/if}
-
-{#if $executionMode === 'parameterized'}
-	<div class="section">
-		<Title>Vehicle-Parameters:</Title>
-		<VehicleParameters />
-		<TimeToExploreEdgesInput />
-	</div>
+{:else}
 	<div class="section">
 		<Title>Number of runs:</Title>
 		<NumberOfRunsInput />
 	</div>
-{/if}
-
-{#if $executionMode === 'explore'}
-	<div class="section"><EndPointSelection /></div>
 {/if}
 
 <RunSimulationButton />

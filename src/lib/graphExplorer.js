@@ -1,24 +1,20 @@
 import { get } from 'svelte/store';
 import { fixedNodes, fixedEdges } from './graphStructure';
-import {
-	nodeStates,
-	edgeStates,
-	selectedEndpoint,
-	vehicleParameters,
-	executionMode
-} from './stores';
+import { edgeStates, nodeStates, selectedEndpoint, vehicleParameters } from './stores';
 import { delay } from './utils';
 import { addLog } from './logging';
 
-const addCustomLog = function (message, level) {
-	if (get(executionMode) === 'parameterized') return;
-	addLog(message, level);
-};
-
+/**
+ * The vehicle's own strategy: a depth-first exploration of a map it does not
+ * know in advance, guided by a directional and sector-based heuristic.
+ *
+ * Animation pacing and simulated driving time are separate. `animationMs`
+ * only controls how fast you watch it; the time it reports is accumulated
+ * from the vehicle parameters, so it is comparable with what the map-aware
+ * algorithms report and does not depend on the machine it ran on.
+ */
 export class GraphExplorer {
-	constructor(startNodeId = 'S', delayInMilliseconds = 200, { exMode, endPoint } = {}) {
-		const mode = exMode ?? get(executionMode);
-
+	constructor(startNodeId = 'S', animationMs = 0, { endPoint, vehicleParams, quiet = false } = {}) {
 		this.startNodeId = startNodeId;
 		this.goalNodeId = endPoint ?? get(selectedEndpoint);
 		this.visitedNodes = new Set();
@@ -29,19 +25,20 @@ export class GraphExplorer {
 			edges: fixedEdges
 		};
 		this.nodeStack = [];
-		this.nodeDelay = mode === 'explore' ? delayInMilliseconds : 0;
-		this.exploreEdgeDelay =
-			mode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToExploreEdges;
-		this.solidEdgeTraversalDelay =
-			mode === 'explore' ? delayInMilliseconds : get(vehicleParameters).timeToTraverse;
-		this.barrierEdgeTraversalDelay =
-			mode === 'explore' ? delayInMilliseconds * 3 : get(vehicleParameters).timeWithBarrier;
+		this.animationMs = animationMs;
+		this.vehicleParams = vehicleParams ?? get(vehicleParameters);
+		this.quiet = quiet;
+		this.simulatedTime = 0;
 		this.goalReached = false;
-		this.exMode = mode;
+	}
+
+	_log(message, level) {
+		if (this.quiet) return;
+		addLog(message, level);
 	}
 
 	async explore() {
-		addCustomLog('Starting map exploration...', 'info');
+		this._log('Starting map exploration...', 'info');
 		this.nodeStack.push({ nodeId: this.startNodeId, edgeId: null }); // Initialize with start node and no leading edge
 
 		while (this.nodeStack.length > 0) {
@@ -60,13 +57,13 @@ export class GraphExplorer {
 				const from = leadingEdge.from === currentNodeId ? leadingEdge.to : leadingEdge.from;
 				const to = leadingEdge.from === currentNodeId ? leadingEdge.from : leadingEdge.to;
 
-				addCustomLog(`Edge from '${from}' to '${to}' marked as traversed`, 'info');
+				this._log(`Edge from '${from}' to '${to}' marked as traversed`, 'info');
 			}
 
 			// Now visit the current node
 			await this._exploreNode(currentNodeId);
 		}
-		addCustomLog('Map exploration complete!', 'success');
+		this._log('Map exploration complete!', 'success');
 	}
 
 	async _exploreNode(nodeId) {
@@ -80,7 +77,7 @@ export class GraphExplorer {
 		let edges = await this._getPossibleEdges(nodeId);
 
 		if (!edges || edges.length === 0) {
-			addCustomLog(`No possible edges from node '${nodeId}', backtracking...`, 'info');
+			this._log(`No possible edges from node '${nodeId}', backtracking...`, 'info');
 			return; // Backtrack if there are no possible edges
 		}
 
@@ -92,7 +89,7 @@ export class GraphExplorer {
 
 				// Only proceed if the next node is unvisited and unrestricted
 				if (!this.visitedNodes.has(nextNodeId) && !this._isNodeRestricted(nextNodeId)) {
-					addCustomLog(`Adding node '${nextNodeId}' to stack`, 'info');
+					this._log(`Adding node '${nextNodeId}' to stack`, 'info');
 					// Push the node and the edge that leads to it onto the stack
 					this.nodeStack.push({ nodeId: nextNodeId, edgeId: edge.id });
 				}
@@ -234,7 +231,7 @@ export class GraphExplorer {
 			return 0; // Keep the original order if no alignment can be calculated
 		});
 
-		addCustomLog(
+		this._log(
 			`Prioritized edges from node '${nodeId}' with section and direction priority: ${JSON.stringify(
 				possibleEdges.map((e) => {
 					const from = e.from === nodeId ? e.from : e.to;
@@ -249,9 +246,10 @@ export class GraphExplorer {
 	}
 
 	async _exploreEdge(edge, currentNode) {
-		await delay(this.exploreEdgeDelay);
+		this.simulatedTime += this.vehicleParams.timeToExploreEdges;
+		await delay(this.animationMs);
 
-		addCustomLog(`Exploring edge from '${edge.from}' to '${edge.to}'`);
+		this._log(`Exploring edge from '${edge.from}' to '${edge.to}'`);
 		const targetNodeId = edge.to === currentNode ? edge.from : edge.to; // Ensure target node is the opposite node
 		const edgeId = edge.id;
 
@@ -269,7 +267,7 @@ export class GraphExplorer {
 			const from = edge.from === currentNode ? edge.from : edge.to;
 			const to = edge.from === currentNode ? edge.to : edge.from;
 
-			addCustomLog(
+			this._log(
 				`Edge from '${from}' to '${to}' marked as intraversable due to cone at target node '${targetNodeId}'`,
 				'warn'
 			);
@@ -280,11 +278,11 @@ export class GraphExplorer {
 	}
 
 	async _markEdgeAsTraversed(edgeId) {
-		await delay(
+		this.simulatedTime +=
 			get(edgeStates)[edgeId]?.type === 'barrier'
-				? this.barrierEdgeTraversalDelay
-				: this.solidEdgeTraversalDelay
-		);
+				? this.vehicleParams.timeWithBarrier
+				: this.vehicleParams.timeToTraverse;
+		await delay(this.animationMs);
 		this._updateEdgeState(edgeId, { explState: 'visited', visibility: 'visible' });
 	}
 
@@ -298,13 +296,13 @@ export class GraphExplorer {
 	_hasCone(nodeId) {
 		const nodeState = get(nodeStates)[nodeId];
 		const isObstacle = nodeState?.isObstacle || false;
-		addCustomLog(`Checking for cone at node '${nodeId}' - isObstacle: ${isObstacle}`, 'info');
+		this._log(`Checking for cone at node '${nodeId}' - isObstacle: ${isObstacle}`, 'info');
 		return isObstacle;
 	}
 
 	async _visitNode(nodeId) {
-		await delay(this.nodeDelay);
-		addCustomLog(`Visiting node '${nodeId}'`, 'info');
+		await delay(this.animationMs);
+		this._log(`Visiting node '${nodeId}'`, 'info');
 		this.visitedNodes.add(nodeId);
 		this._updateNodeState(nodeId, { explState: 'visited', visibility: 'visible' });
 	}
@@ -445,7 +443,7 @@ export class GraphExplorer {
 			if (nodeAtIntersection && get(nodeStates)[nodeAtIntersection.id]?.explState === 'default') {
 				const from = edge.from === nodeAtIntersection.id ? edge.from : edge.to;
 				const to = edge.from === nodeAtIntersection.id ? edge.to : edge.from;
-				addCustomLog(
+				this._log(
 					`Node '${nodeAtIntersection.id}' detected due to intersection of 'Edge (${to} - ${from})' and 'Edge (${visitedEdge.to} - ${visitedEdge.from}'`
 				);
 				this._updateNodeState(nodeAtIntersection.id, {
@@ -464,5 +462,10 @@ export class GraphExplorer {
 
 	hasReachedGoal() {
 		return this.goalReached;
+	}
+
+	/** Simulated driving time, accumulated from the vehicle parameters. */
+	getSimulatedTime() {
+		return this.simulatedTime;
 	}
 }

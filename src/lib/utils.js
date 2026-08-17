@@ -29,17 +29,24 @@ export function resetExplorationStates() {
 const START_EDGE_IDS = [1, 2, 14];
 
 /**
- * Sets node and edge visibility for the given execution mode.
+ * Shows the whole map, or only the start node and the sections leading out of
+ * it so an exploring run can uncover the rest as it drives.
+ *
+ * Which of the two applies is a property of the algorithm, not of the run
+ * mode: only the exploring vehicle lacks a map to begin with. Showing a
+ * partial map to Dijkstra would misrepresent what it knows.
  *
  * Builds new state objects rather than writing in place: resetGraph() puts the
  * shared default objects into the stores by reference, so an in-place write
  * would permanently corrupt those defaults.
  */
-export function updateVisibility(mode) {
+export function updateVisibility(reveal) {
+	const showAll = reveal !== 'start-only';
+
 	nodeStates.update((states) => {
 		const newStates = { ...states };
 		for (const node of fixedNodes) {
-			const isVisible = mode === 'interactive' || (mode === 'explore' && node.id === 'S');
+			const isVisible = showAll || node.id === 'S';
 			newStates[node.id] = {
 				...(newStates[node.id] || {}),
 				visibility: isVisible ? 'visible' : 'hidden'
@@ -53,7 +60,7 @@ export function updateVisibility(mode) {
 		for (const edge of fixedEdges) {
 			const isStartEdge = START_EDGE_IDS.includes(edge.id);
 			const isMissing = newStates[edge.id]?.type === 'dashed';
-			const isVisible = mode === 'interactive' || (mode === 'explore' && isStartEdge && !isMissing);
+			const isVisible = showAll || (isStartEdge && !isMissing);
 
 			newStates[edge.id] = {
 				...(newStates[edge.id] || {}),

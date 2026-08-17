@@ -10,20 +10,11 @@
 </script>
 
 <div class="segmented-button">
-	<button
-		class:selected={selectedOption === 'interactive'}
-		on:click={() => selectOption('interactive')}
-	>
-		Interactive run
+	<button class:selected={selectedOption === 'single'} on:click={() => selectOption('single')}>
+		Single run
 	</button>
-	<button
-		class:selected={selectedOption === 'parameterized'}
-		on:click={() => selectOption('parameterized')}
-	>
-		Parameterized run
-	</button>
-	<button class:selected={selectedOption === 'explore'} on:click={() => selectOption('explore')}>
-		Exploration
+	<button class:selected={selectedOption === 'bulk'} on:click={() => selectOption('bulk')}>
+		Bulk run
 	</button>
 </div>
 

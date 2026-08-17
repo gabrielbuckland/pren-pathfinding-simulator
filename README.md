@@ -32,8 +32,8 @@ assumes a global view of those changes, which the vehicle does not have.
 
 So the team designed its own strategy instead: a **depth-first exploration guided by a
 directional and sector-based heuristic**. It is what the physical vehicle runs, and it is what
-the **Explore** and **Parameterized** modes drive. The classical three remain in the simulator
-for comparison, which is what the original requirements asked for.
+the Exploration algorithm and the bulk run use. The classical four remain in the simulator for
+comparison, which is what the original requirements asked for.
 
 ## The exploration strategy
 
@@ -49,24 +49,20 @@ search backtracks and tries the next best alternative.
 One extra trick: when a newly discovered edge **crosses** an edge the vehicle already knows,
 the intersection point is computed with linear algebra and compared against the known node
 positions. If a node sits there, its existence is inferred without the vehicle ever having
-driven to it. Those inferred nodes show up in the Explore visualisation.
+driven to it. Those inferred nodes show up while the Exploration run animates.
 
 ## Modes
 
-The dashboard on the right offers three execution modes:
+**Single run.** Pick an algorithm and watch it work on the map you laid out, with a live log
+of every decision it makes. Selecting Exploration hides the map down to the start node and
+uncovers it as the vehicle drives, because that algorithm is the only one that does not start
+with a map. The others are shown the whole thing, since that is what they are given.
 
-**Interactive run.** Configure the vehicle's timing parameters, pick one of the algorithms,
-and run it on the map you laid out. The graph animates as the algorithm proceeds and a live
-log records every decision it makes.
-
-**Parameterized run.** Generate _N_ randomized maps and run the exploration strategy on each
-one without animation. Every map is built around a guaranteed route to its goal; a run that
-still fails is discarded and retried, and the batch gives up after a bounded number of
-attempts rather than retrying forever. The log reports the simulated time per run plus the
-total and average, and can be exported as CSV.
-
-**Explore.** Pick a goal node and watch the exploration strategy alone, animated, revealing
-the map step by step including the inferred junctions.
+**Bulk run.** Generate _N_ randomized maps and run the exploring vehicle on each one without
+animation. Every map is built around a guaranteed route to its goal; a run that still fails is
+discarded and retried, and the batch gives up after a bounded number of attempts rather than
+retrying forever. The log reports the simulated time per run plus the total and average, and
+can be exported as CSV.
 
 ## Editing the map
 
@@ -75,18 +71,21 @@ the map step by step including the inferred junctions.
 
 ## Algorithms
 
-All four run on the fully known map, so their results bound what the exploring vehicle could
-achieve at best. The gap between them and the exploring run is the cost of not knowing the map.
+| Selection       | Knows the map | Minimises      | Notes                                                                              |
+| --------------- | ------------- | -------------- | ---------------------------------------------------------------------------------- |
+| **Exploration** | no            | nothing        | The vehicle's own strategy. Discovers the map while driving.                       |
+| **Dijkstra**    | yes           | driving time   | Uniform-cost baseline.                                                             |
+| **A\***         | yes           | driving time   | Same costs, guided by an admissible time heuristic.                                |
+| **D\*Lite**     | yes           | driving time   | Backwards search with the key and consistency machinery. See the limitation below. |
+| **BFS**         | yes           | number of hops | Kept as a deliberate contrast, see below.                                          |
 
-| Selection    | Minimises      | Notes                                                                              |
-| ------------ | -------------- | ---------------------------------------------------------------------------------- |
-| **Dijkstra** | driving time   | Uniform-cost baseline.                                                             |
-| **A\***      | driving time   | Same costs, guided by an admissible time heuristic.                                |
-| **D\*Lite**  | driving time   | Backwards search with the key and consistency machinery. See the limitation below. |
-| **BFS**      | number of hops | Kept as a deliberate contrast, see below.                                          |
+All five report a traversal time in the same units, so the cost of not knowing the map is a
+matter of running Exploration, noting the number, then running Dijkstra and comparing.
 
-The first three minimise **simulated driving time**, not geometric distance, so a barrier that
-costs twice as much to cross is worth a detour and they compute it that way.
+Dijkstra, A\* and D\* Lite minimise **simulated driving time**, not geometric distance, so a
+barrier that costs twice as much to cross is worth a detour and they compute it that way. Since
+they are handed the full map, their results bound what the exploring vehicle could achieve at
+best.
 
 BFS is the odd one out on purpose. It minimises the number of edges, which is what a breadth
 first search does by construction, and it is blind to what those edges cost. Put a barrier on

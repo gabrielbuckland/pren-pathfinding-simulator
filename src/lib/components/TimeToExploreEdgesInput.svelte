@@ -18,7 +18,7 @@
 <div class="time-to-explore-edges">
 	<div class="row">
 		<label>
-			Time to explore edges:
+			Time to scan an edge (time units):
 			<input
 				type="number"
 				min="0"
