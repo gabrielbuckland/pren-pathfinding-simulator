@@ -23,7 +23,7 @@
 		Parameterized run
 	</button>
 	<button class:selected={selectedOption === 'explore'} on:click={() => selectOption('explore')}>
-		Explore map
+		Exploration
 	</button>
 </div>
 

@@ -3,7 +3,7 @@
 	import Title from '../lib/components/Title.svelte';
 	import LogViewer from '../lib/components/LogViewer.svelte';
 	import { nodeStates, edgeStates, selectedEndpoint } from '../lib/stores.js';
-	import { resetExplorationStates, generateRandomGraph, getRandomGoalNode } from '../lib/utils';
+	import { generateRandomGraph, getRandomGoalNode } from '../lib/utils';
 	import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 	import GraphViewer from '../lib/components/GraphViewer.svelte';
 	import DashboardViewer from '../lib/components/DashboardViewer.svelte';
@@ -14,10 +14,6 @@
 		// Clone, so the shared defaults never end up in the store by reference.
 		nodeStates.set(structuredClone(defaultNodeStates));
 		edgeStates.set(structuredClone(defaultEdgeStates));
-	}
-
-	function resetState() {
-		resetExplorationStates();
 	}
 
 	function randomizeGraph() {
@@ -42,12 +38,15 @@
 	<div slot="left" class="left-pane">
 		<div class="title-reset-container">
 			<Title>Graph</Title>
-			<div class="button-container">
-				<button class="randomize-btn" on:click={randomizeGraph}>Randomized graph</button>
-				<button on:click={resetGraph}>Reset graph</button>
-				<button on:click={resetState}>Reset state</button>
+			<div class="map-actions">
+				<span class="map-actions-label">Map:</span>
+				<button class="randomize-btn" on:click={randomizeGraph}>Randomize</button>
+				<button on:click={resetGraph}>Clear</button>
 			</div>
 		</div>
+		<p class="edit-hint">
+			Click an edge to cycle passable, missing and barrier. Click a node to place a pylon.
+		</p>
 		<div class="graph-area">
 			<GraphViewer />
 			{#if $executionMode !== 'parameterized'}
@@ -95,9 +94,21 @@
 		width: 100%;
 	}
 
-	.button-container {
+	.map-actions {
 		display: flex;
+		align-items: center;
 		gap: 0.5rem;
+	}
+
+	.map-actions-label {
+		font-weight: 600;
+	}
+
+	/* The map is only editable by clicking it, which nothing else says. */
+	.edit-hint {
+		margin: 0.25rem 0 0 0;
+		font-size: 0.85rem;
+		color: #666;
 	}
 
 	button {

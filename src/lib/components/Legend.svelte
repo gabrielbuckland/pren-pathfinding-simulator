@@ -41,8 +41,6 @@
 			Barrier
 		</span>
 	</div>
-
-	<p class="hint">Click an edge to cycle its type, click a node to toggle an obstacle.</p>
 </div>
 
 <style>
@@ -97,12 +95,5 @@
 		width: 1rem;
 		height: 1rem;
 		object-fit: contain;
-	}
-
-	.hint {
-		flex-basis: 100%;
-		margin: 0;
-		color: #777;
-		font-style: italic;
 	}
 </style>

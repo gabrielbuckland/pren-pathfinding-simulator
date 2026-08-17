@@ -57,12 +57,18 @@
 		outline: none;
 		background-color: transparent;
 		background-image: url('/src/lib/images/cone.png');
-		background-position: center;
+		background-position: center bottom;
 		background-repeat: no-repeat;
-		background-size: contain;
+		/* The cone occupies the lower part of the node box so the label stays
+		   readable above it, without moving the node off its position. */
+		background-size: auto 72%;
+		align-items: flex-start;
 		font-weight: 700;
-		text-shadow: 0 0 0.8rem black;
-		transform: translate(-50%, -75%);
+		color: #000;
+		text-shadow:
+			0 0 3px #fff,
+			0 0 3px #fff,
+			0 0 3px #fff;
 	}
 
 	.selected-endpoint {
