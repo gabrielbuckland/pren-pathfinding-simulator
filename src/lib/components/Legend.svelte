@@ -5,7 +5,7 @@
 	/**
 	 * Two independent things are being described here.
 	 *
-	 * What a node or a section IS comes from the map you drew, and is shown by
+	 * What a node or an edge IS comes from the map you drew, and is shown by
 	 * its shape. What a run has FOUND OUT about it is shown by its colour, and
 	 * Node.svelte and Edge.svelte use the same five colours for that, so the
 	 * colours are listed once rather than twice.
@@ -30,19 +30,19 @@
 		</span>
 		<span class="item" title="A pylon blocks it. Click a node to place or remove one.">
 			<img src={coneImage} alt="" />
-			Pylon
+			Blocked
 		</span>
 	</div>
 
 	<div class="group">
-		<span class="group-title">Section</span>
+		<span class="group-title">Edge</span>
 		<span class="item" title="Can be driven">
 			<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">
 				<line x1="2" y1="7" x2="26" y2="7" class="outline" />
 			</svg>
 			Passable
 		</span>
-		<span class="item" title="Removed from the map, no route through it">
+		<span class="item" title="Removed from the map, no route across it">
 			<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">
 				<line x1="2" y1="7" x2="26" y2="7" class="outline" stroke-dasharray="5 6" />
 			</svg>

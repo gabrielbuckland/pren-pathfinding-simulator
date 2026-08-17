@@ -74,19 +74,8 @@
 	{height}
 	style="position: absolute; left: {left}px; top: {top}px;"
 >
-	<!-- Draw the line directly between the nodes -->
-	<line
-		class="{currentType} state-{currentExplState}"
-		{x1}
-		{y1}
-		{x2}
-		{y2}
-		role="button"
-		tabindex="0"
-		aria-label="Toggle edge {id}"
-		on:click={handleClick}
-		on:keydown={handleKeydown}
-	/>
+	<!-- Purely presentational: the visible section and its barrier. -->
+	<line class="visual {currentType} state-{currentExplState}" {x1} {y1} {x2} {y2} />
 	{#if currentType === 'barrier'}
 		<image
 			href={barrierImage}
@@ -94,13 +83,25 @@
 			y={midY - barrierHeight / 2}
 			width={barrierWidth}
 			height={barrierHeight}
-			role="button"
-			tabindex="0"
-			aria-label="Toggle edge {id}"
-			on:click={handleClick}
-			on:keydown={handleKeydown}
 		/>
 	{/if}
+
+	<!-- A wider transparent line on top carries the interaction. A dashed stroke
+	     only hit-tests where it is painted, so without this the gaps of a removed
+	     edge would not respond to a click. It also makes every edge easier to hit
+	     than its 4px stroke. -->
+	<line
+		class="hit-area"
+		{x1}
+		{y1}
+		{x2}
+		{y2}
+		role="button"
+		tabindex="0"
+		aria-label="Change edge {id}"
+		on:click={handleClick}
+		on:keydown={handleKeydown}
+	/>
 </svg>
 
 <style>
@@ -120,24 +121,29 @@
 		pointer-events: none;
 	}
 
-	line {
+	line.visual {
 		stroke: black;
 		stroke-width: 4;
 		stroke-linecap: round;
-		pointer-events: all;
+		pointer-events: none;
+	}
+
+	.hit-area {
+		stroke: transparent;
+		stroke-width: 14;
+		stroke-linecap: butt;
+		pointer-events: stroke;
 		cursor: pointer;
 	}
 
-	/* Editing the map is a click, and a ring left behind on every clicked
-	   section clutters the graph. Keyboard focus still shows one, since that is
-	   the only way a keyboard user can tell where they are. */
-	line:focus,
-	image:focus {
+	/* Editing the map is a click, and a ring left behind on every clicked edge
+	   clutters the graph. Keyboard focus still shows one, since that is the only
+	   way a keyboard user can tell where they are. */
+	.hit-area:focus {
 		outline: none;
 	}
 
-	line:focus-visible,
-	image:focus-visible {
+	.hit-area:focus-visible {
 		outline: 2px solid #007bff;
 		outline-offset: 2px;
 	}
@@ -167,7 +173,6 @@
 	}
 
 	image {
-		pointer-events: all;
-		cursor: pointer;
+		pointer-events: none;
 	}
 </style>

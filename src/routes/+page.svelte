@@ -44,7 +44,7 @@
 			</div>
 		</div>
 		<p class="edit-hint">
-			Click a section to cycle passable, removed and barrier. Click a node to place a pylon.
+			Click an edge to cycle passable, removed and barrier. Click a node to place a pylon.
 		</p>
 		<div class="graph-area">
 			<GraphViewer />
