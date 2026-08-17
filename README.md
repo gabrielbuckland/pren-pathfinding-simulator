@@ -75,17 +75,32 @@ the map step by step including the inferred junctions.
 
 ## Algorithms
 
-| Selection      | Knows the map upfront | Notes                                                                                   |
-| -------------- | --------------------- | --------------------------------------------------------------------------------------- |
-| **Simulation** | No                    | Breadth-first search that reveals the map as it goes.                                   |
-| **Dijkstra**   | Yes                   | Uniform-cost baseline over the time model.                                              |
-| **A\***        | Yes                   | Same costs, guided by an admissible time heuristic.                                     |
-| **D\*Lite**    | Yes                   | Backwards search with the D\* Lite key/consistency machinery. See the limitation below. |
+All four run on the fully known map, so their results bound what the exploring vehicle could
+achieve at best. The gap between them and the exploring run is the cost of not knowing the map.
 
-All three map-aware algorithms minimise **simulated driving time**, not geometric distance,
-so a barrier that costs twice as much to cross is worth a detour and they compute it that
-way. Since they are given the full map, their results act as a lower bound: the best any
-strategy could do. The gap to the exploring vehicle is the cost of not knowing the map.
+| Selection    | Minimises      | Notes                                                                              |
+| ------------ | -------------- | ---------------------------------------------------------------------------------- |
+| **Dijkstra** | driving time   | Uniform-cost baseline.                                                             |
+| **A\***      | driving time   | Same costs, guided by an admissible time heuristic.                                |
+| **D\*Lite**  | driving time   | Backwards search with the key and consistency machinery. See the limitation below. |
+| **BFS**      | number of hops | Kept as a deliberate contrast, see below.                                          |
+
+The first three minimise **simulated driving time**, not geometric distance, so a barrier that
+costs twice as much to cross is worth a detour and they compute it that way.
+
+BFS is the odd one out on purpose. It minimises the number of edges, which is what a breadth
+first search does by construction, and it is blind to what those edges cost. Put a barrier on
+a single-hop route and BFS still drives through it while Dijkstra goes around:
+
+```
+barrier on S-3, timeToTraverse = 1, timeWithBarrier = 100
+
+BFS        100 units   one hop, straight through the barrier
+Dijkstra     2 units   two hops, around it
+```
+
+Fewest junctions is not fastest. Having both in the same dashboard makes that visible in one
+click.
 
 ## Cost model
 
@@ -127,8 +142,8 @@ Then open http://localhost:5173.
 src/
 ├── lib/
 │   ├── graphExplorer.js      # The exploration strategy that ships on the vehicle
-│   ├── algorithms.js         # Run orchestration and the exploring BFS
-│   ├── algorithms/           # aStar.js, dijkstra.js, dStarLite.js
+│   ├── algorithms.js         # Run orchestration for all modes
+│   ├── algorithms/           # aStar.js, bfs.js, dijkstra.js, dStarLite.js
 │   │                         # graphCosts.js  : time costs, heuristic, adjacency
 │   │                         # graphVisuals.js: shared store updates for animation
 │   ├── graphStructure.js     # Fixed node/edge layout and default states

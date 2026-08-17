@@ -18,7 +18,7 @@ export const vehicleParameters = writable({
 export const selectedEndpoint = writable('A');
 
 // Store for selectedAlgorithm
-export const selectedAlgorithm = writable('Simulation');
+export const selectedAlgorithm = writable('BFS');
 
 // Store execution mode (either 'interactive' or 'parameterized')
 export const executionMode = writable('interactive');
