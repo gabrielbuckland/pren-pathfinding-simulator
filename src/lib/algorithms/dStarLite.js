@@ -33,12 +33,7 @@ class PriorityQueue {
 	}
 }
 
-export async function runDStarLite(
-	startNodeId,
-	goalNodeId,
-	vehicleParams,
-	animationMs
-) {
+export async function runDStarLite(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	// Initialize data structures
 	const rhs = {};
 	const g = {};
@@ -47,7 +42,6 @@ export async function runDStarLite(
 
 	const s_start = startNodeId;
 	const s_goal = goalNodeId;
-	let s_last = s_start;
 
 	// Initialize g and rhs for all nodes
 	for (const node of fixedNodes) {
@@ -79,8 +73,8 @@ export async function runDStarLite(
 				...states,
 				[u.item]: {
 					...(states[u.item] || {}),
-					explState: 'visited',
-				},
+					explState: 'visited'
+				}
 			}));
 			await delay(animationMs);
 
@@ -91,7 +85,6 @@ export async function runDStarLite(
 				U.enqueue(s, calculateKey(s, s_start, g, rhs, km));
 			}
 		} else {
-			const g_old = g[u.item];
 			g[u.item] = Infinity;
 
 			// Visual updates
@@ -100,8 +93,8 @@ export async function runDStarLite(
 				...states,
 				[u.item]: {
 					...(states[u.item] || {}),
-					explState: 'visited',
-				},
+					explState: 'visited'
+				}
 			}));
 			await delay(animationMs);
 
@@ -153,10 +146,7 @@ export async function runDStarLite(
 // Helper functions
 function calculateKey(s, s_start, g, rhs, km) {
 	const min_g_rhs = Math.min(g[s], rhs[s]);
-	return [
-		min_g_rhs + heuristic(s_start, s) + km,
-		min_g_rhs,
-	];
+	return [min_g_rhs + heuristic(s_start, s) + km, min_g_rhs];
 }
 
 function keyCompare(a, b) {
@@ -237,10 +227,7 @@ function distanceBetween(nodeIdA, nodeIdB) {
 
 function getEdgeId(fromId, toId) {
 	for (const edge of fixedEdges) {
-		if (
-			(edge.from === fromId && edge.to === toId) ||
-			(edge.from === toId && edge.to === fromId)
-		) {
+		if ((edge.from === fromId && edge.to === toId) || (edge.from === toId && edge.to === fromId)) {
 			return edge.id;
 		}
 	}
@@ -254,8 +241,8 @@ async function highlightPath(path, vehicleParams, animationMs) {
 			...states,
 			[nodeId]: {
 				...(states[nodeId] || {}),
-				explState: 'finished',
-			},
+				explState: 'finished'
+			}
 		}));
 		if (i > 0) {
 			const fromNodeId = path[i - 1];
@@ -265,8 +252,8 @@ async function highlightPath(path, vehicleParams, animationMs) {
 				...states,
 				[edgeId]: {
 					...(states[edgeId] || {}),
-					explState: 'finished',
-				},
+					explState: 'finished'
+				}
 			}));
 		}
 		await delay(animationMs);
@@ -281,9 +268,7 @@ async function highlightPath(path, vehicleParams, animationMs) {
 		const edgeType = get(edgeStates)[edgeId]?.type || 'solid';
 
 		const traversalTime =
-			edgeType === 'barrier'
-				? vehicleParams.timeWithBarrier
-				: vehicleParams.timeToTraverse;
+			edgeType === 'barrier' ? vehicleParams.timeWithBarrier : vehicleParams.timeToTraverse;
 
 		totalTime += traversalTime;
 	}

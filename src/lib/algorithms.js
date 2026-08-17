@@ -1,5 +1,5 @@
 import { nodeStates, edgeStates, algorithmLogs } from './stores.js';
-import { fixedEdges, fixedNodes } from './graphStructure.js';
+import { fixedEdges } from './graphStructure.js';
 import { get } from 'svelte/store';
 import { addLog } from './logging.js';
 import { delay, generateRandomGraph, getRandomGoalNode } from './utils.js';
@@ -231,16 +231,6 @@ function getNeighbors(nodeId) {
 		}
 	}
 	return neighbors;
-}
-
-function markEdgeRestriced(edgeId) {
-	edgeStates.update((states) => ({
-		...states,
-		[edgeId]: {
-			...(states[edgeId] || {}),
-			explState: 'restricted'
-		}
-	}));
 }
 
 function markNodeRestricted(nodeId) {

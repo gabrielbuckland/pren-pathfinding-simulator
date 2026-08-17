@@ -7,7 +7,7 @@
 		timeToExploreEdges = params.timeToExploreEdges;
 	});
 
-	function updateTimeToExploreEdges(newTime) {
+	function updateTimeToExploreEdges() {
 		vehicleParameters.update((params) => ({
 			...params,
 			timeToExploreEdges: timeToExploreEdges

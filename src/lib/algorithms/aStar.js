@@ -30,8 +30,8 @@ export async function runAStar(startNodeId, goalNodeId, vehicleParams, animation
 			...states,
 			[currentNodeId]: {
 				...(states[currentNodeId] || {}),
-				explState: 'visited',
-			},
+				explState: 'visited'
+			}
 		}));
 
 		await delay(animationMs);
@@ -51,8 +51,7 @@ export async function runAStar(startNodeId, goalNodeId, vehicleParams, animation
 				continue; // Ignore the neighbor which is already evaluated
 			}
 
-			const tentativeGScore =
-				gScore[currentNodeId] + distanceBetween(currentNodeId, neighborId);
+			const tentativeGScore = gScore[currentNodeId] + distanceBetween(currentNodeId, neighborId);
 
 			if (!openSet.has(neighborId)) {
 				openSet.add(neighborId);
@@ -61,8 +60,8 @@ export async function runAStar(startNodeId, goalNodeId, vehicleParams, animation
 					...states,
 					[neighborId]: {
 						...(states[neighborId] || {}),
-						explState: 'probed',
-					},
+						explState: 'probed'
+					}
 				}));
 			} else if (tentativeGScore >= (gScore[neighborId] || Infinity)) {
 				continue; // This is not a better path
@@ -71,8 +70,7 @@ export async function runAStar(startNodeId, goalNodeId, vehicleParams, animation
 			// This path is the best until now. Record it!
 			cameFrom[neighborId] = currentNodeId;
 			gScore[neighborId] = tentativeGScore;
-			fScore[neighborId] =
-				gScore[neighborId] + heuristicCostEstimate(neighborId, goalNodeId);
+			fScore[neighborId] = gScore[neighborId] + heuristicCostEstimate(neighborId, goalNodeId);
 
 			// Mark edge as 'probed'
 			const edgeId = getEdgeId(currentNodeId, neighborId);
@@ -80,8 +78,8 @@ export async function runAStar(startNodeId, goalNodeId, vehicleParams, animation
 				...states,
 				[edgeId]: {
 					...(states[edgeId] || {}),
-					explState: 'probed',
-				},
+					explState: 'probed'
+				}
 			}));
 
 			await delay(animationMs);
@@ -166,10 +164,7 @@ function getNodePosition(nodeId) {
 // Helper function to get the edge ID between two nodes
 function getEdgeId(fromId, toId) {
 	for (const edge of fixedEdges) {
-		if (
-			(edge.from === fromId && edge.to === toId) ||
-			(edge.from === toId && edge.to === fromId)
-		) {
+		if ((edge.from === fromId && edge.to === toId) || (edge.from === toId && edge.to === fromId)) {
 			return edge.id;
 		}
 	}
@@ -180,16 +175,14 @@ function getEdgeId(fromId, toId) {
 function markNodeAndEdgesRestricted(nodeId) {
 	markNodeRestricted(nodeId);
 
-	const connectedEdges = fixedEdges.filter(
-		(edge) => edge.from === nodeId || edge.to === nodeId
-	);
+	const connectedEdges = fixedEdges.filter((edge) => edge.from === nodeId || edge.to === nodeId);
 
 	edgeStates.update((states) => {
 		const newStates = { ...states };
 		for (const edge of connectedEdges) {
 			newStates[edge.id] = {
 				...(newStates[edge.id] || {}),
-				explState: 'restricted',
+				explState: 'restricted'
 			};
 		}
 		return newStates;
@@ -202,8 +195,8 @@ function markNodeRestricted(nodeId) {
 		...states,
 		[nodeId]: {
 			...(states[nodeId] || {}),
-			explState: 'restricted',
-		},
+			explState: 'restricted'
+		}
 	}));
 }
 
@@ -222,8 +215,8 @@ async function reconstructPath(cameFrom, currentNodeId, vehicleParams, animation
 			...states,
 			[nodeId]: {
 				...(states[nodeId] || {}),
-				explState: 'finished',
-			},
+				explState: 'finished'
+			}
 		}));
 		if (i > 0) {
 			const fromNodeId = path[i - 1];
@@ -233,8 +226,8 @@ async function reconstructPath(cameFrom, currentNodeId, vehicleParams, animation
 				...states,
 				[edgeId]: {
 					...(states[edgeId] || {}),
-					explState: 'finished',
-				},
+					explState: 'finished'
+				}
 			}));
 		}
 		await delay(animationMs);
@@ -251,9 +244,7 @@ async function reconstructPath(cameFrom, currentNodeId, vehicleParams, animation
 		const edgeType = get(edgeStates)[edgeId]?.type || 'solid';
 
 		const traversalTime =
-			edgeType === 'barrier'
-				? vehicleParams.timeWithBarrier
-				: vehicleParams.timeToTraverse;
+			edgeType === 'barrier' ? vehicleParams.timeWithBarrier : vehicleParams.timeToTraverse;
 
 		totalTime += traversalTime;
 	}

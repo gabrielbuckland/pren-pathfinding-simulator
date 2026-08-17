@@ -10,8 +10,6 @@
 		"test": "vitest"
 	},
 	"devDependencies": {
-		"@fontsource/fira-mono": "^5.0.0",
-		"@neoconfetti/svelte": "^2.0.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
@@ -28,7 +26,6 @@
 		"vitest": "^2.1.5"
 	},
 	"type": "module",
-	"dependencies": {
-		"three": "^0.169.0"
-	}
+	"description": "Browser-based simulator for pathfinding and graph exploration on a partially-known map (HSLU PREN project)",
+	"license": "MIT"
 }

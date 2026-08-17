@@ -1,6 +1,6 @@
 <script>
 	import { edgeStates } from '../stores.js';
-	import { get } from 'svelte/store';
+	import barrierImage from '../images/barrier.png';
 
 	export let id;
 	export let from = { x1: 0, y1: 0 };
@@ -60,6 +60,12 @@
 			};
 		});
 	}
+
+	function handleKeydown(e) {
+		if (e.key === 'Enter' || e.key === ' ') {
+			handleClick(e);
+		}
+	}
 </script>
 
 <svg
@@ -69,15 +75,30 @@
 	style="position: absolute; left: {left}px; top: {top}px;"
 >
 	<!-- Draw the line directly between the nodes -->
-	<line class="{currentType} state-{currentExplState}" {x1} {y1} {x2} {y2} on:click={handleClick} />
+	<line
+		class="{currentType} state-{currentExplState}"
+		{x1}
+		{y1}
+		{x2}
+		{y2}
+		role="button"
+		tabindex="0"
+		aria-label="Toggle edge {id}"
+		on:click={handleClick}
+		on:keydown={handleKeydown}
+	/>
 	{#if currentType === 'barrier'}
 		<image
-			href="/src/lib/images/barrier.png"
+			href={barrierImage}
 			x={midX - barrierWidth / 2}
 			y={midY - barrierHeight / 2}
 			width={barrierWidth}
 			height={barrierHeight}
+			role="button"
+			tabindex="0"
+			aria-label="Toggle edge {id}"
 			on:click={handleClick}
+			on:keydown={handleKeydown}
 		/>
 	{/if}
 </svg>
@@ -105,6 +126,20 @@
 		stroke-linecap: round;
 		pointer-events: all;
 		cursor: pointer;
+	}
+
+	/* Editing the map is a click, and a ring left behind on every clicked
+	   section clutters the graph. Keyboard focus still shows one, since that is
+	   the only way a keyboard user can tell where they are. */
+	line:focus,
+	image:focus {
+		outline: none;
+	}
+
+	line:focus-visible,
+	image:focus-visible {
+		outline: 2px solid #007bff;
+		outline-offset: 2px;
 	}
 
 	line.dashed {

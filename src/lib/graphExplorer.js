@@ -19,7 +19,7 @@ export class GraphExplorer {
 	constructor(
 		startNodeId = 'S',
 		delayInMilliseconds = 200,
-		{ nodeStates, edgeStates, $selectedEndpoint, exMode, endPoint } = {
+		{ nodeStates, edgeStates, exMode, endPoint } = {
 			exMode: get(executionMode)
 		}
 	) {
@@ -53,8 +53,6 @@ export class GraphExplorer {
 	}
 
 	async explore() {
-		console.log(this.solidEdgeTraversalDelay, this.barrierEdgeTraversalDelay);
-
 		addCustomLog('Starting map exploration...', 'info');
 		this.nodeStack.push({ nodeId: this.startNodeId, edgeId: null }); // Initialize with start node and no leading edge
 
@@ -156,14 +154,12 @@ export class GraphExplorer {
 		};
 
 		const targetSection = this._getNodeSection(goalNode); // Determine target section based on goal
-		const currentSection = this._getNodeSection(currentNode);
 
 		// Define scoring adjustments
 		const sectionBoost = 3; // Boost for staying in the target section
 		const wrongDirectionPenalty = 0.5; // Penalty for wrong direction even within the target section
 		const directionBoost = 3; // Boost for correct direction within the target section
 		const returnBoost = 2; // Boost for returning to the target section
-		const furtherAwayPenalty = -2; // Strong penalty for moving further from the target section
 
 		const possibleEdges = this._getEdgesFromNode(nodeId).filter(
 			(e) =>

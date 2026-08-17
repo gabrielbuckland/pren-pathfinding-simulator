@@ -6,12 +6,7 @@ import { get } from 'svelte/store';
 import { addLog } from '../logging.js';
 import { delay } from '../utils.js';
 
-export async function runDijkstra(
-	startNodeId,
-	goalNodeId,
-	vehicleParams,
-	animationMs
-) {
+export async function runDijkstra(startNodeId, goalNodeId, vehicleParams, animationMs) {
 	const distances = {};
 	const previous = {};
 	const visited = new Set();
@@ -46,8 +41,8 @@ export async function runDijkstra(
 			...states,
 			[currentNodeId]: {
 				...(states[currentNodeId] || {}),
-				explState: 'visited',
-			},
+				explState: 'visited'
+			}
 		}));
 		await delay(animationMs);
 
@@ -64,8 +59,7 @@ export async function runDijkstra(
 			}
 
 			const edgeId = getEdgeId(currentNodeId, neighborId);
-			const altDistance =
-				distances[currentNodeId] + distanceBetween(currentNodeId, neighborId);
+			const altDistance = distances[currentNodeId] + distanceBetween(currentNodeId, neighborId);
 
 			if (altDistance < distances[neighborId]) {
 				distances[neighborId] = altDistance;
@@ -76,15 +70,15 @@ export async function runDijkstra(
 					...states,
 					[neighborId]: {
 						...(states[neighborId] || {}),
-						explState: 'probed',
-					},
+						explState: 'probed'
+					}
 				}));
 				edgeStates.update((states) => ({
 					...states,
 					[edgeId]: {
 						...(states[edgeId] || {}),
-						explState: 'probed',
-					},
+						explState: 'probed'
+					}
 				}));
 				await delay(animationMs);
 			}
@@ -125,10 +119,7 @@ function getNeighbors(nodeId) {
 
 function getEdgeId(fromId, toId) {
 	for (const edge of fixedEdges) {
-		if (
-			(edge.from === fromId && edge.to === toId) ||
-			(edge.from === toId && edge.to === fromId)
-		) {
+		if ((edge.from === fromId && edge.to === toId) || (edge.from === toId && edge.to === fromId)) {
 			return edge.id;
 		}
 	}
@@ -166,8 +157,8 @@ async function reconstructPath(previous, currentNodeId, vehicleParams, animation
 			...states,
 			[nodeId]: {
 				...(states[nodeId] || {}),
-				explState: 'finished',
-			},
+				explState: 'finished'
+			}
 		}));
 		if (i > 0) {
 			const fromNodeId = path[i - 1];
@@ -177,8 +168,8 @@ async function reconstructPath(previous, currentNodeId, vehicleParams, animation
 				...states,
 				[edgeId]: {
 					...(states[edgeId] || {}),
-					explState: 'finished',
-				},
+					explState: 'finished'
+				}
 			}));
 		}
 		await delay(animationMs);
@@ -193,9 +184,7 @@ async function reconstructPath(previous, currentNodeId, vehicleParams, animation
 		const edgeType = get(edgeStates)[edgeId]?.type || 'solid';
 
 		const traversalTime =
-			edgeType === 'barrier'
-				? vehicleParams.timeWithBarrier
-				: vehicleParams.timeToTraverse;
+			edgeType === 'barrier' ? vehicleParams.timeWithBarrier : vehicleParams.timeToTraverse;
 
 		totalTime += traversalTime;
 	}
@@ -206,16 +195,14 @@ async function reconstructPath(previous, currentNodeId, vehicleParams, animation
 function markNodeAndEdgesRestricted(nodeId) {
 	markNodeRestricted(nodeId);
 
-	const connectedEdges = fixedEdges.filter(
-		(edge) => edge.from === nodeId || edge.to === nodeId
-	);
+	const connectedEdges = fixedEdges.filter((edge) => edge.from === nodeId || edge.to === nodeId);
 
 	edgeStates.update((states) => {
 		const newStates = { ...states };
 		for (const edge of connectedEdges) {
 			newStates[edge.id] = {
 				...(newStates[edge.id] || {}),
-				explState: 'restricted',
+				explState: 'restricted'
 			};
 		}
 		return newStates;
@@ -227,7 +214,7 @@ function markNodeRestricted(nodeId) {
 		...states,
 		[nodeId]: {
 			...(states[nodeId] || {}),
-			explState: 'restricted',
-		},
+			explState: 'restricted'
+		}
 	}));
 }

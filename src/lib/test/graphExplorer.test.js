@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { writable } from 'svelte/store';
 
 import { fixedNodes, fixedEdges, defaultNodeStates, defaultEdgeStates } from '../graphStructure';
-import { GraphExplorer } from '../graphExplorer';
+import { GraphExplorer } from '../graphExplorer.js';
 
 // Mock stores
 const createMockStore = (initialValue) => writable(initialValue);

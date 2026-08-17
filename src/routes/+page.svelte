@@ -2,7 +2,7 @@
 	import Container from '../lib/components/Container.svelte';
 	import Title from '../lib/components/Title.svelte';
 	import LogViewer from '../lib/components/LogViewer.svelte';
-	import { nodeStates, edgeStates, executionMode } from '../lib/stores.js';
+	import { nodeStates, edgeStates } from '../lib/stores.js';
 	import { resetExplorationStates, generateRandomGraph, getRandomGoalNode } from '../lib/utils';
 	import { defaultNodeStates, defaultEdgeStates } from '../lib/graphStructure.js';
 	import GraphViewer from '../lib/components/GraphViewer.svelte';

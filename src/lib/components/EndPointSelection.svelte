@@ -3,7 +3,7 @@
 </script>
 
 <div class="endpoint-selection">
-	<label>Select endpoint:</label>
+	<span class="group-label">Select endpoint:</span>
 	<div class="radio-buttons">
 		<label>
 			<input type="radio" name="endpoint" value="A" bind:group={$selectedEndpoint} />
