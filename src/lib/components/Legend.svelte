@@ -2,53 +2,71 @@
 	import barrierImage from '../images/barrier.png';
 	import coneImage from '../images/cone.png';
 
-	// Grouped by the two things you can click, and drawn the way the graph
-	// draws them: an unexplored node is an outlined circle, not a filled dot.
-	const nodeStates = [
-		{ label: 'Unexplored', fill: 'white', border: 'black', hint: 'not looked at yet' },
-		{ label: 'Probed', fill: 'yellow', border: 'yellow', hint: 'seen from a neighbour' },
-		{ label: 'Visited', fill: 'green', border: 'green', hint: 'driven through' },
-		{ label: 'Final path', fill: 'blue', border: 'blue', hint: 'part of the chosen route' }
+	/**
+	 * Two independent things are being described here.
+	 *
+	 * What a node or a section IS comes from the map you drew, and is shown by
+	 * its shape. What a run has FOUND OUT about it is shown by its colour, and
+	 * Node.svelte and Edge.svelte use the same five colours for that, so the
+	 * colours are listed once rather than twice.
+	 */
+	const runStates = [
+		{ label: 'Untouched', stroke: 'black', fill: 'white', hint: 'the run has not reached it' },
+		{ label: 'Probed', stroke: 'yellow', fill: 'yellow', hint: 'seen from a neighbour' },
+		{ label: 'Visited', stroke: 'green', fill: 'green', hint: 'driven through' },
+		{ label: 'Ruled out', stroke: 'red', fill: 'red', hint: 'found to be unusable' },
+		{ label: 'Final route', stroke: 'blue', fill: 'blue', hint: 'part of the chosen route' }
 	];
 </script>
 
 <div class="legend">
 	<div class="group">
 		<span class="group-title">Node</span>
-		{#each nodeStates as state}
-			<span class="item" title={state.hint}>
-				<span class="swatch" style="background-color: {state.fill}; border-color: {state.border}"
-				></span>
-				{state.label}
-			</span>
-		{/each}
-		<!-- A node only ever turns red because a pylon stands on it, so the two
-		     are one entry rather than two. -->
-		<span class="item" title="A pylon blocks the node it stands on. Click a node to place one.">
-			<span class="swatch" style="background-color: red; border-color: red"></span>
+		<span class="item" title="Can be driven through">
+			<svg class="glyph" viewBox="0 0 14 14" aria-hidden="true">
+				<circle cx="7" cy="7" r="5.5" class="outline" />
+			</svg>
+			Open
+		</span>
+		<span class="item" title="A pylon blocks it. Click a node to place or remove one.">
 			<img src={coneImage} alt="" />
-			Blocked by pylon
+			Pylon
 		</span>
 	</div>
 
 	<div class="group">
 		<span class="group-title">Section</span>
 		<span class="item" title="Can be driven">
-			<svg class="line-sample" viewBox="0 0 32 8" aria-hidden="true">
-				<line x1="2" y1="4" x2="30" y2="4" />
+			<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">
+				<line x1="2" y1="7" x2="26" y2="7" class="outline" />
 			</svg>
 			Passable
 		</span>
 		<span class="item" title="Removed from the map, no route through it">
-			<svg class="line-sample missing" viewBox="0 0 32 8" aria-hidden="true">
-				<line x1="2" y1="4" x2="30" y2="4" stroke-dasharray="5 7" />
+			<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">
+				<line x1="2" y1="7" x2="26" y2="7" class="outline" stroke-dasharray="5 6" />
 			</svg>
-			Missing
+			Removed
 		</span>
 		<span class="item" title="Can be driven, but costs the barrier time instead">
 			<img src={barrierImage} alt="" />
 			Barrier
 		</span>
+	</div>
+
+	<div class="group">
+		<span class="group-title">Run state</span>
+		{#each runStates as state}
+			<span class="item" title={state.hint}>
+				<!-- Line and circle together, because the colour means the same on a
+				     section as it does on a node. -->
+				<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">
+					<line x1="1" y1="7" x2="15" y2="7" stroke={state.stroke} stroke-width="4" />
+					<circle cx="21" cy="7" r="5" fill={state.fill} stroke={state.stroke} stroke-width="2" />
+				</svg>
+				{state.label}
+			</span>
+		{/each}
 	</div>
 </div>
 
@@ -57,7 +75,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.5rem 1.5rem;
+		gap: 0.4rem 1.25rem;
 		padding: 0.75rem 0 0 0;
 		font-size: 0.8rem;
 		color: #333;
@@ -66,12 +84,13 @@
 	.group {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 0.6rem;
 	}
 
 	.group-title {
 		font-weight: 600;
 		color: #666;
+		white-space: nowrap;
 	}
 
 	.item {
@@ -81,30 +100,22 @@
 		white-space: nowrap;
 	}
 
-	/* Same shape and border weight as a node in the graph, at a smaller size. */
-	.swatch {
-		width: 0.85rem;
-		height: 0.85rem;
-		border-radius: 50%;
-		border: 2px solid;
-		box-sizing: border-box;
+	.glyph {
+		width: 0.9rem;
+		height: 0.9rem;
+		flex: none;
 	}
 
-	.line-sample {
-		width: 2rem;
-		height: 0.5rem;
-		overflow: visible;
+	.glyph.wide {
+		width: 1.8rem;
 	}
 
-	/* Matches the stroke the graph actually uses, so the sample is recognisable. */
-	.line-sample line {
-		stroke: black;
-		stroke-width: 4;
+	/* Shapes are neutral, so colour stays the property of the run state. */
+	.glyph .outline {
+		stroke: #555;
+		stroke-width: 2.5;
 		stroke-linecap: round;
-	}
-
-	.line-sample.missing line {
-		stroke-width: 3;
+		fill: none;
 	}
 
 	.item img {

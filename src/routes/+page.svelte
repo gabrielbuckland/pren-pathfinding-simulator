@@ -44,7 +44,7 @@
 			</div>
 		</div>
 		<p class="edit-hint">
-			Click an edge to cycle passable, missing and barrier. Click a node to place a pylon.
+			Click a section to cycle passable, removed and barrier. Click a node to place a pylon.
 		</p>
 		<div class="graph-area">
 			<GraphViewer />
@@ -70,8 +70,11 @@
 		height: 100%;
 	}
 
-	/* Keeps the legend attached to the graph instead of the bottom of the pane. */
+	/* Width is pinned to the canvas so the legend lines up under the graph
+	   rather than stretching to the edge of the pane. */
 	.graph-area {
+		width: 35rem;
+		max-width: 100%;
 		margin: auto;
 	}
 
