@@ -5,7 +5,7 @@ built to develop and validate the navigation strategy of an autonomous vehicle f
 PREN 1 module at Lucerne University of Applied Sciences and Arts (HSLU).
 
 The vehicle starts at a known point on a fixed track layout but does **not** know in advance
-which connections are passable — some carry a barrier, some have been removed entirely, and
+which connections are passable. Some carry a barrier, some have been removed entirely, and
 some junctions are blocked by a pylon. It has to discover the map while driving toward one of
 three possible goal points, and the goal is only announced immediately before the start. This
 simulator makes that problem visible and measurable: you can place the obstacles by hand,
@@ -21,7 +21,7 @@ It is not. Every classical algorithm here assumes the map is known before the fi
 the vehicle's situation breaks that assumption in three specific ways:
 
 - **Dead ends.** The vehicle can drive into a branch that turns out to be closed and has to
-  find its way back out — a case a precomputed shortest path has no answer for.
+  find its way back out. A precomputed shortest path has no answer for that.
 - **Blocked junctions behind open ones.** A pylon can sit on a node directly beyond a node
   that looked free, so a plan made in advance commits to a route that cannot be driven.
 - **Removed sections.** When a connection is missing, knowing which alternatives exist
@@ -39,7 +39,7 @@ for comparison, which is what the original requirements asked for.
 
 Implemented in `src/lib/graphExplorer.js`.
 
-The track is divided into three sectors — left (goal A), middle (goal B), right (goal C). At
+The track is divided into three sectors: left (goal A), middle (goal B), right (goal C). At
 every junction the vehicle scans its unexplored edges and scores them by two criteria: whether
 the edge leads into the goal's sector, and how closely it points along the vector to the goal.
 Edges heading the wrong way are penalised, edges returning toward the target sector are
@@ -55,17 +55,17 @@ driven to it. Those inferred nodes show up in the Explore visualisation.
 
 The dashboard on the right offers three execution modes:
 
-**Interactive run** — configure the vehicle's timing parameters, pick one of the algorithms,
+**Interactive run.** Configure the vehicle's timing parameters, pick one of the algorithms,
 and run it on the map you laid out. The graph animates as the algorithm proceeds and a live
 log records every decision it makes.
 
-**Parameterized run** — generate _N_ randomized maps and run the exploration strategy on each
+**Parameterized run.** Generate _N_ randomized maps and run the exploration strategy on each
 one without animation. Every map is built around a guaranteed route to its goal; a run that
 still fails is discarded and retried, and the batch gives up after a bounded number of
 attempts rather than retrying forever. The log reports the simulated time per run plus the
 total and average, and can be exported as CSV.
 
-**Explore** — pick a goal node and watch the exploration strategy alone, animated, revealing
+**Explore.** Pick a goal node and watch the exploration strategy alone, animated, revealing
 the map step by step including the inferred junctions.
 
 ## Editing the map
@@ -75,15 +75,15 @@ the map step by step including the inferred junctions.
 
 ## Algorithms
 
-| Selection      | Knows the map upfront | Notes                                                                                    |
-| -------------- | --------------------- | ---------------------------------------------------------------------------------------- |
-| **Simulation** | No                    | Breadth-first search that reveals the map as it goes.                                    |
-| **Dijkstra**   | Yes                   | Uniform-cost baseline over the time model.                                               |
-| **A\***        | Yes                   | Same costs, guided by an admissible time heuristic.                                      |
-| **D\*Lite**    | Yes                   | Backwards search with the D\* Lite key/consistency machinery — see the limitation below. |
+| Selection      | Knows the map upfront | Notes                                                                                   |
+| -------------- | --------------------- | --------------------------------------------------------------------------------------- |
+| **Simulation** | No                    | Breadth-first search that reveals the map as it goes.                                   |
+| **Dijkstra**   | Yes                   | Uniform-cost baseline over the time model.                                              |
+| **A\***        | Yes                   | Same costs, guided by an admissible time heuristic.                                     |
+| **D\*Lite**    | Yes                   | Backwards search with the D\* Lite key/consistency machinery. See the limitation below. |
 
-All three map-aware algorithms minimise **simulated driving time**, not geometric distance —
-so a barrier that costs twice as much to cross is worth a detour, and they compute it that
+All three map-aware algorithms minimise **simulated driving time**, not geometric distance,
+so a barrier that costs twice as much to cross is worth a detour and they compute it that
 way. Since they are given the full map, their results act as a lower bound: the best any
 strategy could do. The gap to the exploring vehicle is the cost of not knowing the map.
 
@@ -91,14 +91,14 @@ strategy could do. The gap to the exploring vehicle is the cost of not knowing t
 
 Three configurable parameters drive the simulated time:
 
-- `timeToTraverse` — driving across a clear edge
-- `timeWithBarrier` — driving across an edge that carries a barrier
-- `timeToExploreEdges` — scanning an edge to find out which of the three it is
+- `timeToTraverse`: driving across a clear edge
+- `timeWithBarrier`: driving across an edge that carries a barrier
+- `timeToExploreEdges`: scanning an edge to find out which of the three it is
 
 A\*'s heuristic is the Euclidean distance to the goal scaled by
 `cheapest edge cost / longest edge length`. Covering a straight-line distance needs at least
 that many edges, and no edge is cheaper than the cheapest type, so the estimate never
-overshoots the true remaining time and satisfies the triangle inequality — which is what keeps
+overshoots the true remaining time and satisfies the triangle inequality, which is what keeps
 A\* optimal while using a closed set.
 
 ## Getting started
@@ -129,8 +129,8 @@ src/
 │   ├── graphExplorer.js      # The exploration strategy that ships on the vehicle
 │   ├── algorithms.js         # Run orchestration and the exploring BFS
 │   ├── algorithms/           # aStar.js, dijkstra.js, dStarLite.js
-│   │                         # graphCosts.js  — time costs, heuristic, adjacency
-│   │                         # graphVisuals.js — shared store updates for animation
+│   │                         # graphCosts.js  : time costs, heuristic, adjacency
+│   │                         # graphVisuals.js: shared store updates for animation
 │   ├── graphStructure.js     # Fixed node/edge layout and default states
 │   ├── stores.js             # Svelte stores holding all simulation state
 │   ├── logging.js            # Log plumbing and CSV export
@@ -148,7 +148,7 @@ navigation logic, and `LogViewer` displays and exports the decision log. Because
 simulation state lives in Svelte stores, an animated run and a batch run share one
 implementation.
 
-The node and edge layout in `graphStructure.js` is fixed — it mirrors the physical track used
+The node and edge layout in `graphStructure.js` is fixed. It mirrors the physical track used
 in the competition. Randomization varies which edges are blocked or missing and which of A/B/C
 is the goal, not the topology itself.
 
@@ -156,7 +156,7 @@ is the goal, not the topology itself.
 
 Worth stating plainly rather than leaving for a reader to discover:
 
-- **D\* Lite is not incremental.** Only the `ComputeShortestPath` half is implemented — there
+- **D\* Lite is not incremental.** Only the `ComputeShortestPath` half is implemented. There
   is no outer replanning loop and no `km` accumulation, so it recomputes from scratch instead
   of repairing the previous solution. It produces correct shortest paths; it just does not
   demonstrate the property D\* Lite exists for.
@@ -186,15 +186,15 @@ SvelteKit 2 · Svelte 4 · Vite 5 · Vitest 2
 
 ## Contributors
 
-Built for the PREN 1 module at HSLU by Team 10 — six members across mechanics, electronics
+Built for the PREN 1 module at HSLU by Team 10, six members across mechanics, electronics
 and software. This repository is the software team's work:
 
-- **[@gabrielbuckland](https://github.com/gabrielbuckland)** — the exploration strategy in
+- **[@gabrielbuckland](https://github.com/gabrielbuckland)**: the exploration strategy in
   `graphExplorer.js` that ships on the vehicle, including the sector and direction heuristic
   and the linear-algebra inference of unvisited junctions, plus the project's test suite.
-- **[@tramasys](https://github.com/tramasys)** — the Dijkstra, A\* and D\* Lite
+- **[@tramasys](https://github.com/tramasys)**: the Dijkstra, A\* and D\* Lite
   implementations, the random map generation, and much of the UI and logging.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

@@ -25,7 +25,7 @@ export function resetExplorationStates() {
 	});
 }
 
-// Edges leaving the start node 'S' — the only ones visible when exploration begins.
+// Edges leaving the start node 'S', the only ones visible when exploration begins.
 const START_EDGE_IDS = [1, 2, 14];
 
 /**

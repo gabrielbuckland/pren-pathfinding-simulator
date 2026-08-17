@@ -44,7 +44,7 @@ const longestEdgeLength = Math.max(
  * True when an edge cannot be driven at all: it is missing from the map, or
  * one of its endpoints is occupied by an obstacle.
  *
- * A barrier does NOT block an edge — it only makes it more expensive.
+ * A barrier does NOT block an edge. It only makes it more expensive.
  */
 export function isEdgeBlocked(nodeIdA, nodeIdB) {
 	const edgeId = getEdgeId(nodeIdA, nodeIdB);
@@ -75,7 +75,7 @@ export function edgeCost(nodeIdA, nodeIdB, vehicleParams) {
  * Covering a straight-line distance d needs at least d / longestEdgeLength
  * edges, and no edge is cheaper than the cheapest edge type. Scaling the
  * Euclidean distance by that ratio therefore never overestimates the true
- * remaining time, and it satisfies the triangle inequality — which is what
+ * remaining time, and it satisfies the triangle inequality, which is what
  * A* needs to stay optimal while using a closed set.
  */
 export function heuristicTime(nodeId, goalNodeId, vehicleParams) {

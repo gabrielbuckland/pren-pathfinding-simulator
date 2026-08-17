@@ -20,7 +20,7 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Course reports — internal team documents, not for publication
+# Course reports: internal team documents, not for publication
 Meilenstein_*.pdf
 
 # Playwright MCP scratch output

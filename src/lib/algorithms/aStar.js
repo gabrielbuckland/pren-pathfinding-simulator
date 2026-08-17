@@ -7,7 +7,7 @@ import { highlightPath, markEdge, markNode, markObstacleNeighbors } from './grap
  * A* over the fully known map, minimising simulated driving time.
  *
  * The heuristic is the scaled Euclidean distance from graphCosts, which is
- * admissible and consistent with respect to time — so the closed set never
+ * admissible and consistent with respect to time, so the closed set never
  * discards a node that would later turn out to be on a cheaper path.
  */
 export async function runAStar(startNodeId, goalNodeId, vehicleParams, animationMs) {
