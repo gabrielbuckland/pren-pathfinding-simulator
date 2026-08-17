@@ -40,7 +40,7 @@
 			<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">
 				<line x1="2" y1="7" x2="26" y2="7" class="outline" />
 			</svg>
-			Passable
+			Open
 		</span>
 		<span class="item" title="Removed from the map, no route across it">
 			<svg class="glyph wide" viewBox="0 0 28 14" aria-hidden="true">

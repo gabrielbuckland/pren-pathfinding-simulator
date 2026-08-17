@@ -66,7 +66,7 @@ can be exported as CSV.
 
 ## Editing the map
 
-- **Click an edge** to cycle it: passable → removed → blocked by a barrier → passable
+- **Click an edge** to cycle it: open → removed → barrier → open
 - **Click a node** to place or remove a pylon
 
 ## Algorithms
