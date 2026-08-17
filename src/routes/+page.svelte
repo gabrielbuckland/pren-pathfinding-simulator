@@ -39,7 +39,6 @@
 		<div class="title-reset-container">
 			<Title>Graph</Title>
 			<div class="map-actions">
-				<span class="map-actions-label">Map:</span>
 				<button class="randomize-btn" on:click={randomizeGraph}>Randomize</button>
 				<button on:click={resetGraph}>Clear</button>
 			</div>
@@ -94,16 +93,18 @@
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
+		margin-bottom: 0.5rem;
+	}
+
+	/* The heading's own bottom margin would make this row taller than the
+	   heading, pushing the buttons below its centre line. */
+	.title-reset-container :global(h1) {
+		margin-bottom: 0;
 	}
 
 	.map-actions {
 		display: flex;
-		align-items: center;
 		gap: 0.5rem;
-	}
-
-	.map-actions-label {
-		font-weight: 600;
 	}
 
 	/* The map is only editable by clicking it, which nothing else says. */
