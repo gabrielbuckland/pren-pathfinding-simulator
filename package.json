@@ -26,6 +26,9 @@
 		"vite": "^5.0.3",
 		"vitest": "^2.1.5"
 	},
+	"engines": {
+		"node": ">=20"
+	},
 	"type": "module",
 	"description": "Browser-based simulator for pathfinding and graph exploration on a partially-known map (HSLU PREN project)",
 	"license": "MIT"

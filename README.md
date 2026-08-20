@@ -120,6 +120,8 @@ A\* optimal while using a closed set.
 
 ## Getting started
 
+Needs Node 20 or newer, and nothing else.
+
 ```bash
 npm install
 npm run dev
