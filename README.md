@@ -15,6 +15,11 @@ statistics.
 **[Try it here](https://gabrielbuckland.github.io/pren-pathfinding-simulator/)**. The whole
 simulation runs in the browser, so the deployed page is the real thing rather than a recording.
 
+![An exploration run toward goal C. Green is the route the vehicle drove, yellow are edges it
+scanned but did not take, and what is missing entirely is map it has not seen yet. The log on
+the right records every decision, starting with the scored edge list at each
+junction.](docs/simulator.png)
+
 ## Why a custom algorithm
 
 The simulator began as a comparison harness. Dijkstra, A\* and D\* Lite were implemented and
