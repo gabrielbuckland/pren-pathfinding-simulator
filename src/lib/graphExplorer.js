@@ -256,7 +256,9 @@ export class GraphExplorer {
 
 		const targetNodeId = edge.to === currentNode ? edge.from : edge.to; // Ensure target node is the opposite node
 
-		this._log(`Exploring edge from '${currentNode}' to '${targetNodeId}'`);
+		// Scanning, not driving: every edge is scanned worst-first so the best one ends
+		// up on top of the stack. The prioritised list above is the order it drives in.
+		this._log(`Scanning edge from '${currentNode}' to '${targetNodeId}'`);
 		const edgeId = edge.id;
 
 		// Skip if the edge has already been visited
