@@ -1,12 +1,18 @@
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-static';
+
+// The app is a single prerendered route with no server code, so it can be
+// served as plain files. GitHub Pages hosts it under /<repository>, which the
+// build needs to know about; BASE_PATH is set by the deploy workflow and left
+// empty everywhere else, so `npm run dev` still serves from the root.
+const base = process.env.BASE_PATH ?? '';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		// adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
-		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
-		adapter: adapter()
+		adapter: adapter(),
+		paths: {
+			base
+		}
 	}
 };
 

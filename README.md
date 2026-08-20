@@ -12,6 +12,9 @@ simulator makes that problem visible and measurable: you can place the obstacles
 watch the vehicle explore step by step, or run hundreds of randomized maps to get timing
 statistics.
 
+**[Try it here](https://gabrielbuckland.github.io/pren-pathfinding-simulator/)**. The whole
+simulation runs in the browser, so the deployed page is the real thing rather than a recording.
+
 ## Why a custom algorithm
 
 The simulator began as a comparison harness. Dijkstra, A\* and D\* Lite were implemented and
@@ -120,7 +123,9 @@ A\* optimal while using a closed set.
 
 ## Getting started
 
-Needs Node 20 or newer, and nothing else.
+To just use it, open the [hosted
+version](https://gabrielbuckland.github.io/pren-pathfinding-simulator/). To run it locally you
+need Node 20 or newer, and nothing else.
 
 ```bash
 npm install
