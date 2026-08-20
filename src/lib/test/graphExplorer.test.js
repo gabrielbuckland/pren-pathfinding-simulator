@@ -36,8 +36,9 @@ describe('GraphExplorer', () => {
 			x: goalNode.x - startNode.x,
 			y: goalNode.y - startNode.y
 		};
-		expect(goalVector.x).toBeCloseTo(expectedVector.x, 0.1);
-		expect(goalVector.y).toBeCloseTo(expectedVector.y, 0.1);
+		// Second argument is the number of decimal places, not a tolerance.
+		expect(goalVector.x).toBeCloseTo(expectedVector.x, 5);
+		expect(goalVector.y).toBeCloseTo(expectedVector.y, 5);
 	});
 
 	it('calculates vector alignment correctly', () => {

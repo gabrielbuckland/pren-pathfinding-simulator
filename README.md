@@ -98,8 +98,11 @@ BFS        100 units   one hop, straight through the barrier
 Dijkstra     2 units   two hops, around it
 ```
 
-Fewest junctions is not fastest. Having both in the same dashboard makes that visible in one
-click.
+Fewest junctions is not fastest. Those numbers come from the test suite, which drives this
+exact case against both algorithms (`src/lib/test/bfs.test.js`, `src/lib/test/pathCost.test.js`);
+node `3` is an inner junction, so it is a test goal rather than one of the A/B/C endpoints the
+UI offers. Having both algorithms in the same dashboard makes the same effect visible on any
+map you build by hand.
 
 ## Cost model
 
