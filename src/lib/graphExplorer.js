@@ -231,13 +231,18 @@ export class GraphExplorer {
 			return 0; // Keep the original order if no alignment can be calculated
 		});
 
+		// The array is sorted worst-first on purpose: every edge gets scanned, and each
+		// one is pushed onto the LIFO stack, so the best-scoring edge ends up on top and
+		// is the one actually driven next. Log it the way round the priority reads.
 		this._log(
 			`Prioritized edges from node '${nodeId}' with section and direction priority: ${JSON.stringify(
-				possibleEdges.map((e) => {
-					const from = e.from === nodeId ? e.from : e.to;
-					const to = e.from === nodeId ? e.to : e.from;
-					return { from, to };
-				})
+				possibleEdges
+					.map((e) => {
+						const from = e.from === nodeId ? e.from : e.to;
+						const to = e.from === nodeId ? e.to : e.from;
+						return { from, to };
+					})
+					.reverse()
 			)}`,
 			'info'
 		);
@@ -249,8 +254,9 @@ export class GraphExplorer {
 		this.simulatedTime += this.vehicleParams.timeToExploreEdges;
 		await delay(this.animationMs);
 
-		this._log(`Exploring edge from '${edge.from}' to '${edge.to}'`);
 		const targetNodeId = edge.to === currentNode ? edge.from : edge.to; // Ensure target node is the opposite node
+
+		this._log(`Exploring edge from '${currentNode}' to '${targetNodeId}'`);
 		const edgeId = edge.id;
 
 		// Skip if the edge has already been visited
@@ -444,7 +450,7 @@ export class GraphExplorer {
 				const from = edge.from === nodeAtIntersection.id ? edge.from : edge.to;
 				const to = edge.from === nodeAtIntersection.id ? edge.to : edge.from;
 				this._log(
-					`Node '${nodeAtIntersection.id}' detected due to intersection of 'Edge (${to} - ${from})' and 'Edge (${visitedEdge.to} - ${visitedEdge.from}'`
+					`Node '${nodeAtIntersection.id}' detected due to intersection of 'Edge (${to} - ${from})' and 'Edge (${visitedEdge.to} - ${visitedEdge.from})'`
 				);
 				this._updateNodeState(nodeAtIntersection.id, {
 					explState: 'probed',
